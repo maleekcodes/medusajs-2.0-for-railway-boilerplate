@@ -1,6 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import { transferCartToSessionCustomer } from "@lib/data/cart"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
@@ -8,9 +9,38 @@ import { redirect } from "next/navigation"
 import { cache } from "react"
 import { getAuthHeaders, removeAuthToken, setAuthToken } from "./cookies"
 
+function countryCodeFromForm(formData: FormData): string {
+  const raw = formData.get("country_code")
+  if (typeof raw !== "string" || !/^[a-z]{2}$/i.test(raw)) {
+    return "us"
+  }
+  return raw.toLowerCase()
+}
+
+/** Same-region path only; blocks open redirects. */
+function safeReturnPath(
+  value: unknown,
+  countryCode: string
+): string | null {
+  if (typeof value !== "string" || value.length === 0) return null
+  const cc = countryCode.toLowerCase()
+  if (value.includes("..") || value.includes("//")) return null
+  const re = new RegExp(`^/${cc}/[a-zA-Z0-9][a-zA-Z0-9/_-]*$`)
+  if (!re.test(value)) return null
+  return value
+}
+
 export const getCustomer = cache(async function () {
+  const headers = await getAuthHeaders()
   return await sdk.store.customer
-    .retrieve({}, { next: { tags: ["customer"] }, ...getAuthHeaders() })
+    .retrieve(
+      {},
+      {
+        cache: "no-store",
+        next: { tags: ["customer"] },
+        ...headers,
+      }
+    )
     .then(({ customer }) => customer)
     .catch(() => null)
 })
@@ -19,7 +49,7 @@ export const updateCustomer = cache(async function (
   body: HttpTypes.StoreUpdateCustomer
 ) {
   const updateRes = await sdk.store.customer
-    .update(body, {}, getAuthHeaders())
+    .update(body, {}, await getAuthHeaders())
     .then(({ customer }) => customer)
     .catch(medusaError)
 
@@ -29,6 +59,7 @@ export const updateCustomer = cache(async function (
 
 export async function signup(_currentState: unknown, formData: FormData) {
   const password = formData.get("password") as string
+  const countryCode = countryCodeFromForm(formData)
   const customerForm = {
     email: formData.get("email") as string,
     first_name: formData.get("first_name") as string,
@@ -43,46 +74,58 @@ export async function signup(_currentState: unknown, formData: FormData) {
     })
 
     const customHeaders = { authorization: `Bearer ${token}` }
-    
-    const { customer: createdCustomer } = await sdk.store.customer.create(
-      customerForm,
-      {},
-      customHeaders
-    )
+
+    await sdk.store.customer.create(customerForm, {}, customHeaders)
 
     const loginToken = await sdk.auth.login("customer", "emailpass", {
       email: customerForm.email,
       password,
     })
 
-    setAuthToken(typeof loginToken === 'string' ? loginToken : loginToken.location)
+    if (typeof loginToken !== "string") {
+      throw new Error("Unexpected auth response during signup")
+    }
+    await setAuthToken(loginToken)
 
     revalidateTag("customer")
-    return createdCustomer
+    await transferCartToSessionCustomer()
   } catch (error: any) {
     return error.toString()
   }
+  const returnTo =
+    safeReturnPath(formData.get("return_to"), countryCode) ??
+    `/${countryCode}/account`
+  redirect(returnTo)
 }
 
 export async function login(_currentState: unknown, formData: FormData) {
   const email = formData.get("email") as string
   const password = formData.get("password") as string
+  const countryCode = countryCodeFromForm(formData)
 
   try {
-    await sdk.auth
-      .login("customer", "emailpass", { email, password })
-      .then((token) => {
-        setAuthToken(typeof token === 'string' ? token : token.location)
-        revalidateTag("customer")
-      })
+    const token = await sdk.auth.login("customer", "emailpass", {
+      email,
+      password,
+    })
+    if (typeof token !== "string") {
+      throw new Error("Unexpected auth response during login")
+    }
+    await setAuthToken(token)
+    revalidateTag("customer")
+    await transferCartToSessionCustomer()
   } catch (error: any) {
     return error.toString()
   }
+  const returnTo =
+    safeReturnPath(formData.get("return_to"), countryCode) ??
+    `/${countryCode}/account`
+  redirect(returnTo)
 }
 
 export async function signout(countryCode: string) {
   await sdk.auth.logout()
-  removeAuthToken()
+  await removeAuthToken()
   revalidateTag("auth")
   revalidateTag("customer")
   redirect(`/${countryCode}/account`)
@@ -106,7 +149,7 @@ export const addCustomerAddress = async (
   }
 
   return sdk.store.customer
-    .createAddress(address, {}, getAuthHeaders())
+    .createAddress(address, {}, await getAuthHeaders())
     .then(({ customer }) => {
       revalidateTag("customer")
       return { success: true, error: null }
@@ -120,7 +163,7 @@ export const deleteCustomerAddress = async (
   addressId: string
 ): Promise<void> => {
   await sdk.store.customer
-    .deleteAddress(addressId, getAuthHeaders())
+    .deleteAddress(addressId, await getAuthHeaders())
     .then(() => {
       revalidateTag("customer")
       return { success: true, error: null }
@@ -150,7 +193,7 @@ export const updateCustomerAddress = async (
   }
 
   return sdk.store.customer
-    .updateAddress(addressId, address, {}, getAuthHeaders())
+    .updateAddress(addressId, address, {}, await getAuthHeaders())
     .then(() => {
       revalidateTag("customer")
       return { success: true, error: null }

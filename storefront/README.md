@@ -124,7 +124,9 @@ By default this starter supports the following payment integrations
 To enable the integrations you need to add the following to your `.env.local` file:
 
 ```shell
-NEXT_PUBLIC_STRIPE_KEY=<your-stripe-public-key>
+# Publishable key (pk_test_… / pk_live_…) — same Stripe account as backend STRIPE_API_KEY
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<your-stripe-publishable-key>
+# Alias: NEXT_PUBLIC_STRIPE_KEY=<your-stripe-publishable-key>
 NEXT_PUBLIC_PAYPAL_CLIENT_ID=<your-paypal-client-id>
 ```
 

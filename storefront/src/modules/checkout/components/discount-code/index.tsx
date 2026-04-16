@@ -1,12 +1,10 @@
 "use client"
 
-import { Badge, Heading, Input, Label, Text, Tooltip } from "@medusajs/ui"
-import React from "react"
-import { useFormState } from "react-dom"
+import { Badge, Heading, Input, Label, Text } from "@medusajs/ui"
+import React, { useActionState } from "react"
 
 import { applyPromotions, submitPromotionForm } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
-import { InformationCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import Trash from "@modules/common/icons/trash"
 import ErrorMessage from "../error-message"
@@ -16,66 +14,91 @@ type DiscountCodeProps = {
   cart: HttpTypes.StoreCart & {
     promotions: HttpTypes.StorePromotion[]
   }
+  /** Match XYZ cart summary typography (no Medusa default panel / blue link). */
+  variant?: "default" | "xyz"
 }
 
-const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
+const DiscountCode: React.FC<DiscountCodeProps> = ({ cart, variant = "default" }) => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [removeError, setRemoveError] = React.useState<string | null>(null)
 
-  const { items = [], promotions = [] } = cart
+  const { promotions = [] } = cart
+
+  const promotionCodesKey = promotions
+    .filter((p) => !p.is_automatic)
+    .map((p) => p.code)
+    .filter((c): c is string => typeof c === "string" && c.length > 0)
+    .sort()
+    .join("|")
+
   const removePromotionCode = async (code: string) => {
-    const validPromotions = promotions.filter(
-      (promotion) => promotion.code !== code
-    )
+    setRemoveError(null)
+    const remainingCodes = promotions
+      .filter((p) => !p.is_automatic && p.code !== code)
+      .map((p) => p.code)
+      .filter((c): c is string => typeof c === "string" && c.length > 0)
 
-    await applyPromotions(
-      validPromotions.filter((p) => p.code === undefined).map((p) => p.code!)
-    )
-  }
-
-  const addPromotionCode = async (formData: FormData) => {
-    const code = formData.get("code")
-    if (!code) {
-      return
-    }
-    const input = document.getElementById("promotion-input") as HTMLInputElement
-    const codes = promotions
-      .filter((p) => p.code === undefined)
-      .map((p) => p.code!)
-    codes.push(code.toString())
-
-    await applyPromotions(codes)
-
-    if (input) {
-      input.value = ""
+    try {
+      await applyPromotions(remainingCodes)
+    } catch (e: unknown) {
+      setRemoveError(e instanceof Error ? e.message : String(e))
     }
   }
 
-  const [message, formAction] = useFormState(submitPromotionForm, null)
+  const [message, formAction] = useActionState(submitPromotionForm, null)
+
+  React.useEffect(() => {
+    setRemoveError(null)
+  }, [promotionCodesKey])
+
+  const isXyz = variant === "xyz"
 
   return (
-    <div className="w-full bg-white flex flex-col">
-      <div className="txt-medium">
-        <form action={(a) => addPromotionCode(a)} className="w-full mb-5">
-          <Label className="flex gap-x-1 my-2 items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="add-discount-button"
-            >
-              Add Promotion Code(s)
-            </button>
-
-            {/* <Tooltip content="You can add multiple promotion codes">
-              <InformationCircleSolid color="var(--fg-muted)" />
-            </Tooltip> */}
-          </Label>
+    <div
+      className={
+        isXyz ? "flex w-full flex-col" : "flex w-full flex-col bg-white"
+      }
+    >
+      <div className={isXyz ? "" : "txt-medium"}>
+        <form action={formAction} className={isXyz ? "mb-0 w-full" : "mb-5 w-full"}>
+          {isXyz ? (
+            <div className="w-full">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                type="button"
+                className="w-full text-left text-sm text-neutral-500 underline decoration-neutral-300 underline-offset-[5px] transition-colors hover:text-deepBlack hover:decoration-deepBlack"
+                data-testid="add-discount-button"
+              >
+                Add promotion code(s)
+              </button>
+            </div>
+          ) : (
+            <Label className="my-2 flex items-center gap-x-1">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                type="button"
+                className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                data-testid="add-discount-button"
+              >
+                Add Promotion Code(s)
+              </button>
+            </Label>
+          )}
 
           {isOpen && (
             <>
-              <div className="flex w-full gap-x-2">
+              <div
+                className={
+                  isXyz ? "mt-4 flex w-full gap-x-2" : "flex w-full gap-x-2"
+                }
+              >
                 <Input
-                  className="size-full"
+                  key={promotionCodesKey}
+                  className={
+                    isXyz
+                      ? "h-10 w-full min-w-0 rounded-none border-neutral-300"
+                      : "size-full"
+                  }
                   id="promotion-input"
                   name="code"
                   type="text"
@@ -85,6 +108,11 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                 <SubmitButton
                   variant="secondary"
                   data-testid="discount-apply-button"
+                  className={
+                    isXyz
+                      ? "h-10 shrink-0 rounded-none border border-deepBlack bg-white px-4 text-xs font-mono uppercase tracking-widest text-deepBlack hover:bg-neutral-100"
+                      : undefined
+                  }
                 >
                   Apply
                 </SubmitButton>
@@ -99,11 +127,21 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
         </form>
 
         {promotions.length > 0 && (
-          <div className="w-full flex items-center">
-            <div className="flex flex-col w-full">
-              <Heading className="txt-medium mb-2">
-                Promotion(s) applied:
-              </Heading>
+          <div
+            className={
+              isXyz ? "mt-4 flex w-full items-center" : "flex w-full items-center"
+            }
+          >
+            <div className="flex w-full flex-col">
+              {isXyz ? (
+                <div className="mb-2 text-sm font-bold text-deepBlack">
+                  Promotion(s) applied:
+                </div>
+              ) : (
+                <Heading className="txt-medium mb-2">
+                  Promotion(s) applied:
+                </Heading>
+              )}
 
               {promotions.map((promotion) => {
                 return (
@@ -112,7 +150,13 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                     className="flex items-center justify-between w-full max-w-full mb-2"
                     data-testid="discount-row"
                   >
-                    <Text className="flex gap-x-1 items-baseline txt-small-plus w-4/5 pr-1">
+                    <Text
+                      className={
+                        isXyz
+                          ? "flex w-4/5 items-baseline gap-x-1 pr-1 text-sm text-deepBlack"
+                          : "flex w-4/5 items-baseline gap-x-1 txt-small-plus pr-1"
+                      }
+                    >
                       <span className="truncate" data-testid="discount-code">
                         <Badge
                           color={promotion.is_automatic ? "green" : "grey"}
@@ -165,6 +209,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                   </div>
                 )
               })}
+              <ErrorMessage
+                error={removeError}
+                data-testid="remove-discount-error-message"
+              />
             </div>
           </div>
         )}

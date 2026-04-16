@@ -15,9 +15,10 @@ export const getAuthHeaders = async (): Promise<{ authorization: string } | {}> 
 export const setAuthToken = async (token: string) => {
   const cookiesStore = await cookies()
   cookiesStore.set("_medusa_jwt", token, {
+    path: "/",
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   })
 }
@@ -25,6 +26,7 @@ export const setAuthToken = async (token: string) => {
 export const removeAuthToken = async () => {
   const cookiesStore = await cookies()
   cookiesStore.set("_medusa_jwt", "", {
+    path: "/",
     maxAge: -1,
   })
 }

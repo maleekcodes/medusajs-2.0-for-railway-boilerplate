@@ -2,7 +2,7 @@ import ItemsTemplate from "./items"
 import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
-import Divider from "@modules/common/components/divider"
+import { Container } from "@modules/common/components/xyz/Container"
 import { HttpTypes } from "@medusajs/types"
 
 const CartTemplate = ({
@@ -12,38 +12,37 @@ const CartTemplate = ({
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
 }) => {
+  const count = cart?.items?.length ?? 0
+
   return (
-    <div className="py-12">
-      <div className="content-container" data-testid="cart-container">
-        {cart?.items?.length ? (
-          <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
-            <div className="flex flex-col bg-white py-6 gap-y-6">
-              {!customer && (
-                <>
-                  <SignInPrompt />
-                  <Divider />
-                </>
-              )}
-              <ItemsTemplate items={cart?.items} />
+    <div className="pt-28 pb-24 bg-white text-deepBlack min-h-screen">
+      <Container data-testid="cart-container">
+        {count > 0 ? (
+          <>
+            <div className="mb-10 md:mb-12">
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tighter">
+                CART
+              </h1>
+              <span className="text-neutral-500 font-mono text-sm">
+                {count} {count === 1 ? "item" : "items"}
+              </span>
             </div>
-            <div className="relative">
-              <div className="flex flex-col gap-y-8 sticky top-12">
-                {cart && cart.region && (
-                  <>
-                    <div className="bg-white py-6">
-                      <Summary cart={cart as any} />
-                    </div>
-                  </>
-                )}
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+              <div className="flex flex-col gap-10 lg:col-span-2">
+                {!customer ? <SignInPrompt /> : null}
+                <ItemsTemplate items={cart?.items} />
+              </div>
+              <div className="lg:col-span-1">
+                {cart && cart.region ? (
+                  <Summary cart={cart as HttpTypes.StoreCart & { promotions?: HttpTypes.StorePromotion[] }} />
+                ) : null}
               </div>
             </div>
-          </div>
+          </>
         ) : (
-          <div>
-            <EmptyCartMessage />
-          </div>
+          <EmptyCartMessage />
         )}
-      </div>
+      </Container>
     </div>
   )
 }

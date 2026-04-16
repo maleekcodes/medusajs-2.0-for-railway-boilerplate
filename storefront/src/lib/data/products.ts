@@ -1,9 +1,9 @@
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { cache } from "react"
-import { getRegion } from "./regions"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { sortProducts } from "@lib/util/sort-products"
+import { getRegion } from "./regions"
 
 export const getProductsById = cache(async function ({
   ids,
@@ -17,7 +17,8 @@ export const getProductsById = cache(async function ({
       {
         id: ids,
         region_id: regionId,
-        fields: "*variants.calculated_price,+variants.inventory_quantity",
+        fields:
+          "*variants.calculated_price,+variants.inventory_quantity,*categories,*collection",
       },
       { next: { tags: ["products"] } }
     )
@@ -33,7 +34,8 @@ export const getProductByHandle = cache(async function (
       {
         handle,
         region_id: regionId,
-        fields: "*variants.calculated_price,+variants.inventory_quantity",
+        fields:
+          "*variants.calculated_price,+variants.inventory_quantity,*categories,*collection",
       },
       { next: { tags: ["products"] } }
     )
@@ -137,4 +139,26 @@ export const getProductsListWithSort = cache(async function ({
     nextPage,
     queryParams,
   }
+})
+
+/** Up to 100 physical products, sorted (used for category-grouped /store catalog). */
+export const getPhysicalStoreCatalogProducts = cache(async function ({
+  sortBy = "created_at",
+  countryCode,
+}: {
+  sortBy?: SortOptions
+  countryCode: string
+}): Promise<HttpTypes.StoreProduct[]> {
+  const {
+    response: { products },
+  } = await getProductsList({
+    pageParam: 1,
+    queryParams: {
+      limit: 100,
+      fields: "*variants.calculated_price,*categories,*collection",
+    },
+    countryCode,
+  })
+
+  return sortProducts(products, sortBy)
 })

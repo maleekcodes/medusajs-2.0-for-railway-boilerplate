@@ -1,11 +1,18 @@
-const ErrorMessage = ({ error, 'data-testid': dataTestid }: { error?: string | null, 'data-testid'?: string }) => {
-  if (!error) {
+const ErrorMessage = ({
+  error,
+  "data-testid": dataTestid,
+}: {
+  error?: string | null
+  "data-testid"?: string
+}) => {
+  const text = typeof error === "string" ? error : null
+  if (!text) {
     return null
   }
 
   return (
     <div className="pt-2 text-rose-500 text-small-regular" data-testid={dataTestid}>
-      <span>{error}</span>
+      <span>{text}</span>
     </div>
   )
 }

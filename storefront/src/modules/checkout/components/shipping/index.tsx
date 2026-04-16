@@ -2,13 +2,20 @@
 
 import { RadioGroup } from "@headlessui/react"
 import { CheckCircleSolid } from "@medusajs/icons"
-import { Button, Heading, Text, clx } from "@medusajs/ui"
+import { Button, Text, clx } from "@medusajs/ui"
 
-import Divider from "@modules/common/components/divider"
+import {
+  checkoutEditLink,
+  checkoutPrimaryButton,
+  checkoutRadioCard,
+  checkoutRadioCardSelected,
+  checkoutSectionTitle,
+  checkoutStepDivider,
+} from "@modules/checkout/components/checkout-ui"
 import Radio from "@modules/common/components/radio"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { startTransition, useCallback, useEffect, useState } from "react"
 import { setShippingMethod } from "@lib/data/cart"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
@@ -31,9 +38,20 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const isOpen = searchParams.get("step") === "delivery"
 
+  const cartShippingOptionId =
+    cart.shipping_methods?.at(-1)?.shipping_option_id ?? ""
+
+  /** Always a string so RadioGroup stays controlled (never `undefined`). */
+  const [selectedOptionId, setSelectedOptionId] = useState<string>(
+    cartShippingOptionId
+  )
+
+  useEffect(() => {
+    setSelectedOptionId(cartShippingOptionId)
+  }, [cartShippingOptionId, cart.id])
+
   const selectedShippingMethod = availableShippingMethods?.find(
-    // To do: remove the previously selected shipping method instead of using the last one
-    (method) => method.id === cart.shipping_methods?.at(-1)?.shipping_option_id
+    (method) => method.id === selectedOptionId
   )
 
   const handleEdit = () => {
@@ -44,16 +62,26 @@ const Shipping: React.FC<ShippingProps> = ({
     router.push(pathname + "?step=payment", { scroll: false })
   }
 
-  const set = async (id: string) => {
-    setIsLoading(true)
-    await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
-      .catch((err) => {
-        setError(err.message)
-      })
-      .finally(() => {
+  const applyShippingMethod = useCallback(
+    async (id: string) => {
+      const previousId = selectedOptionId
+      setSelectedOptionId(id)
+      setError(null)
+      setIsLoading(true)
+      try {
+        await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
+        startTransition(() => {
+          router.refresh()
+        })
+      } catch (err: unknown) {
+        setSelectedOptionId(previousId)
+        setError(err instanceof Error ? err.message : String(err))
+      } finally {
         setIsLoading(false)
-      })
-  }
+      }
+    },
+    [cart.id, router, selectedOptionId]
+  )
 
   useEffect(() => {
     setError(null)
@@ -61,22 +89,23 @@ const Shipping: React.FC<ShippingProps> = ({
 
   return (
     <div className="bg-white">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
+      <div className="mb-6 flex flex-row items-center justify-between gap-4">
+        <h2
           className={clx(
-            "flex flex-row text-3xl-regular gap-x-2 items-baseline",
+            `flex items-baseline gap-2 ${checkoutSectionTitle}`,
             {
-              "opacity-50 pointer-events-none select-none":
+              "pointer-events-none select-none opacity-50":
                 !isOpen && cart.shipping_methods?.length === 0,
             }
           )}
         >
           Delivery
-          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
-            <CheckCircleSolid />
-          )}
-        </Heading>
+          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 ? (
+            <span className="text-emerald-600" aria-hidden>
+              <CheckCircleSolid />
+            </span>
+          ) : null}
+        </h2>
         {!isOpen &&
           cart?.shipping_address &&
           cart?.billing_address &&
@@ -84,8 +113,9 @@ const Shipping: React.FC<ShippingProps> = ({
             <Text>
               <button
                 onClick={handleEdit}
-                className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                className={checkoutEditLink}
                 data-testid="edit-delivery-button"
+                type="button"
               >
                 Edit
               </button>
@@ -95,7 +125,10 @@ const Shipping: React.FC<ShippingProps> = ({
       {isOpen ? (
         <div data-testid="delivery-options-container">
           <div className="pb-8">
-            <RadioGroup value={selectedShippingMethod?.id} onChange={set}>
+            <RadioGroup
+              value={selectedOptionId}
+              onChange={applyShippingMethod}
+            >
               {availableShippingMethods?.map((option) => {
                 return (
                   <RadioGroup.Option
@@ -103,20 +136,19 @@ const Shipping: React.FC<ShippingProps> = ({
                     value={option.id}
                     data-testid="delivery-option-radio"
                     className={clx(
-                      "flex items-center justify-between text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
+                      checkoutRadioCard,
+                      "items-center justify-between",
                       {
-                        "border-ui-border-interactive":
-                          option.id === selectedShippingMethod?.id,
+                        [checkoutRadioCardSelected]:
+                          option.id === selectedOptionId,
                       }
                     )}
                   >
                     <div className="flex items-center gap-x-4">
-                      <Radio
-                        checked={option.id === selectedShippingMethod?.id}
-                      />
-                      <span className="text-base-regular">{option.name}</span>
+                      <Radio checked={option.id === selectedOptionId} />
+                      <span className="text-sm text-deepBlack">{option.name}</span>
                     </div>
-                    <span className="justify-self-end text-ui-fg-base">
+                    <span className="justify-self-end text-sm tabular-nums text-deepBlack">
                       {convertToLocale({
                         amount: option.amount!,
                         currency_code: cart?.currency_code,
@@ -135,7 +167,7 @@ const Shipping: React.FC<ShippingProps> = ({
 
           <Button
             size="large"
-            className="mt-6"
+            className={clx(checkoutPrimaryButton, "mt-6")}
             onClick={handleSubmit}
             isLoading={isLoading}
             disabled={!cart.shipping_methods?.[0]}
@@ -148,11 +180,11 @@ const Shipping: React.FC<ShippingProps> = ({
         <div>
           <div className="text-small-regular">
             {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
+              <div className="flex w-full max-w-md flex-col">
+                <Text className="mb-1 text-sm font-bold text-deepBlack">
                   Method
                 </Text>
-                <Text className="txt-medium text-ui-fg-subtle">
+                <Text className="text-sm text-neutral-500">
                   {selectedShippingMethod?.name}{" "}
                   {convertToLocale({
                     amount: selectedShippingMethod?.amount!,
@@ -164,7 +196,7 @@ const Shipping: React.FC<ShippingProps> = ({
           </div>
         </div>
       )}
-      <Divider className="mt-8" />
+      <div className={checkoutStepDivider} />
     </div>
   )
 }

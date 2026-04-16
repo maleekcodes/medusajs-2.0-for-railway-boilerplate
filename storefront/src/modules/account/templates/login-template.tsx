@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useParams } from "next/navigation"
 
 import Register from "@modules/account/components/register"
 import Login from "@modules/account/components/login"
@@ -10,15 +11,28 @@ export enum LOGIN_VIEW {
   REGISTER = "register",
 }
 
-const LoginTemplate = () => {
+type LoginTemplateProps = {
+  returnTo?: string
+}
+
+const LoginTemplate = ({ returnTo }: LoginTemplateProps) => {
   const [currentView, setCurrentView] = useState("sign-in")
+  const { countryCode } = useParams() as { countryCode: string }
 
   return (
-    <div className="w-full flex justify-start px-8 py-8">
+    <div className="w-full">
       {currentView === "sign-in" ? (
-        <Login setCurrentView={setCurrentView} />
+        <Login
+          countryCode={countryCode}
+          setCurrentView={setCurrentView}
+          returnTo={returnTo}
+        />
       ) : (
-        <Register setCurrentView={setCurrentView} />
+        <Register
+          countryCode={countryCode}
+          setCurrentView={setCurrentView}
+          returnTo={returnTo}
+        />
       )}
     </div>
   )

@@ -1,8 +1,11 @@
 import { RadioGroup } from "@headlessui/react"
-import { InformationCircleSolid } from "@medusajs/icons"
-import { Text, Tooltip, clx } from "@medusajs/ui"
+import { Text, clx } from "@medusajs/ui"
 import React from "react"
 
+import {
+  checkoutRadioCard,
+  checkoutRadioCardSelected,
+} from "@modules/checkout/components/checkout-ui"
 import Radio from "@modules/common/components/radio"
 
 import PaymentTest from "../payment-test"
@@ -30,9 +33,10 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         value={paymentProviderId}
         disabled={disabled}
         className={clx(
-          "flex flex-col gap-y-2 text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
+          checkoutRadioCard,
+          "flex-col gap-y-2",
           {
-            "border-ui-border-interactive":
+            [checkoutRadioCardSelected]:
               selectedPaymentOptionId === paymentProviderId,
           }
         )}
@@ -40,14 +44,14 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
         <div className="flex items-center justify-between ">
           <div className="flex items-center gap-x-4">
             <Radio checked={selectedPaymentOptionId === paymentProviderId} />
-            <Text className="text-base-regular">
+            <Text className="text-sm text-deepBlack">
               {paymentInfoMap[paymentProviderId]?.title || paymentProviderId}
             </Text>
             {isManual(paymentProviderId) && isDevelopment && (
               <PaymentTest className="hidden small:block" />
             )}
           </div>
-          <span className="justify-self-end text-ui-fg-base">
+          <span className="justify-self-end text-deepBlack">
             {paymentInfoMap[paymentProviderId]?.icon}
           </span>
         </div>

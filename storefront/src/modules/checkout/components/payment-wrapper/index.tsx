@@ -15,31 +15,66 @@ type WrapperProps = {
 
 export const StripeContext = createContext(false)
 
-const stripeKey = process.env.NEXT_PUBLIC_STRIPE_KEY
-const stripePromise = stripeKey ? loadStripe(stripeKey) : null
+/** True when NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY (or NEXT_PUBLIC_STRIPE_KEY) is set — required for Stripe.js / card fields. */
+export const StripePublishableKeyContext = createContext(false)
+
+/** Publishable key (pk_…); must match the Stripe account used by Medusa (`STRIPE_API_KEY` on backend). */
+const stripePublishableKey =
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() ||
+  process.env.NEXT_PUBLIC_STRIPE_KEY?.trim() ||
+  ""
+
+const stripePkConfigured = Boolean(stripePublishableKey)
+
+const stripePromise = stripePublishableKey
+  ? loadStripe(stripePublishableKey)
+  : null
 
 const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+
+function CheckoutProviders({
+  children,
+  stripeElementsActive,
+}: {
+  children: React.ReactNode
+  stripeElementsActive: boolean
+}) {
+  return (
+    <StripePublishableKeyContext.Provider value={stripePkConfigured}>
+      <StripeContext.Provider value={stripeElementsActive}>
+        {children}
+      </StripeContext.Provider>
+    </StripePublishableKeyContext.Provider>
+  )
+}
 
 const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
     (s) => s.status === "pending"
   )
 
-  if (
+  const clientSecret =
+    typeof paymentSession?.data?.client_secret === "string"
+      ? paymentSession.data.client_secret
+      : ""
+
+  const canMountStripeElements =
     isStripe(paymentSession?.provider_id) &&
-    paymentSession &&
-    stripePromise
-  ) {
+    Boolean(paymentSession) &&
+    Boolean(stripePromise) &&
+    clientSecret.length > 0
+
+  if (canMountStripeElements) {
     return (
-      <StripeContext.Provider value={true}>
+      <CheckoutProviders stripeElementsActive>
         <StripeWrapper
-          paymentSession={paymentSession}
-          stripeKey={stripeKey}
+          paymentSession={paymentSession!}
+          stripeKey={stripePublishableKey}
           stripePromise={stripePromise}
         >
           {children}
         </StripeWrapper>
-      </StripeContext.Provider>
+      </CheckoutProviders>
     )
   }
 
@@ -49,20 +84,26 @@ const Wrapper: React.FC<WrapperProps> = ({ cart, children }) => {
     cart
   ) {
     return (
-      <PayPalScriptProvider
-        options={{
-          "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
-          currency: cart?.currency_code.toUpperCase(),
-          intent: "authorize",
-          components: "buttons",
-        }}
-      >
-        {children}
-      </PayPalScriptProvider>
+      <CheckoutProviders stripeElementsActive={false}>
+        <PayPalScriptProvider
+          options={{
+            "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
+            currency: cart?.currency_code.toUpperCase(),
+            intent: "authorize",
+            components: "buttons",
+          }}
+        >
+          {children}
+        </PayPalScriptProvider>
+      </CheckoutProviders>
     )
   }
 
-  return <div>{children}</div>
+  return (
+    <CheckoutProviders stripeElementsActive={false}>
+      <div>{children}</div>
+    </CheckoutProviders>
+  )
 }
 
 export default Wrapper

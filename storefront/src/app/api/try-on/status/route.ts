@@ -1,0 +1,131 @@
+import { NextResponse } from "next/server"
+
+import { assertProductImageForTryon } from "@lib/digital/load-product-for-api"
+import { normalizeDigitalPdpSlug } from "@lib/digital/normalize-digital-slug"
+import {
+  digitalTryonObjectKey,
+  isMinioConfigured,
+  putTryonImageFromUrl,
+  tryonObjectExists,
+} from "@lib/digital/minio-server"
+import { issueSignedPreviewPath } from "@lib/digital/preview-token"
+import {
+  getVirtualTryOnApiKey,
+  getVirtualTryOnProviderBaseUrl,
+} from "@lib/digital/virtual-tryon-config"
+
+export const runtime = "nodejs"
+export const maxDuration = 60
+
+type TryOnProviderStatus = {
+  id?: string
+  status?: string
+  output?: string[] | null
+  error?: string | null
+}
+
+export async function GET(request: Request) {
+  const apiKey = getVirtualTryOnApiKey()
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: "Virtual try-on is not configured" },
+      { status: 503 }
+    )
+  }
+
+  const url = new URL(request.url)
+  const id = url.searchParams.get("id")?.trim()
+  const slug = normalizeDigitalPdpSlug(url.searchParams.get("slug")?.trim() || "")
+
+  if (!id || !slug) {
+    return NextResponse.json(
+      { error: "id and slug query params are required" },
+      { status: 400 }
+    )
+  }
+
+  try {
+    await assertProductImageForTryon(slug)
+  } catch {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 })
+  }
+
+  const statusRes = await fetch(
+    `${getVirtualTryOnProviderBaseUrl()}/status/${id}`,
+    {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      cache: "no-store",
+    }
+  )
+
+  const data = (await statusRes.json().catch(() => ({}))) as TryOnProviderStatus
+
+  if (!statusRes.ok) {
+    return NextResponse.json(
+      { error: "Try-on status request failed", status: "failed" },
+      { status: 502 }
+    )
+  }
+
+  const status = data.status ?? "unknown"
+  const output = Array.isArray(data.output) ? data.output : []
+
+  if (status === "failed" || data.error) {
+    return NextResponse.json({
+      status: "failed",
+      error: typeof data.error === "string" ? data.error : "Try-on failed",
+    })
+  }
+
+  if (status === "completed" && output[0]) {
+    const key = digitalTryonObjectKey(slug, id)
+    if (isMinioConfigured()) {
+      const exists = await tryonObjectExists(key)
+      if (!exists) {
+        try {
+          await putTryonImageFromUrl(key, output[0])
+        } catch (e) {
+          console.error("MinIO upload failed:", e)
+          return NextResponse.json({
+            status: "completed",
+            persisted: false,
+            error:
+              "Could not persist try-on image. Configure MinIO to enable checkout.",
+          })
+        }
+      }
+      let previewUrl: string | undefined
+      try {
+        previewUrl = issueSignedPreviewPath(slug, id)
+      } catch (e) {
+        console.error("Signed preview URL failed:", e)
+        return NextResponse.json({
+          status: "completed",
+          persisted: true,
+          predictionId: id,
+          error:
+            "Could not build preview URL. Set DIGITAL_PREVIEW_HMAC_SECRET, or STRIPE_WEBHOOK_SECRET / MINIO_SECRET_KEY for signing (and ensure MinIO is reachable).",
+        })
+      }
+      return NextResponse.json({
+        status: "completed",
+        persisted: true,
+        predictionId: id,
+        previewUrl,
+      })
+    }
+
+    return NextResponse.json({
+      status: "completed",
+      persisted: false,
+      predictionId: id,
+      error:
+        "MinIO is not configured. Set MINIO_* for persisted try-on, preview, and checkout. Raw provider URLs are not exposed to the browser.",
+    })
+  }
+
+  return NextResponse.json({
+    status,
+    predictionId: id,
+  })
+}

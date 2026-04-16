@@ -11,14 +11,28 @@ import { HttpTypes } from "@medusajs/types"
 
 const SideMenuItems = {
   Home: "/",
-  Store: "/store",
+  "Physical Form": "/store",
+  "Digital Form": "/digital",
+  About: "/about",
+  Journal: "/journal",
+  "AR Fit": "/ar-fit",
   Search: "/search",
   Account: "/account",
   Cart: "/cart",
 }
 
-const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
+const SideMenu = ({
+  regions,
+  variant = "light",
+}: {
+  regions: HttpTypes.StoreRegion[] | null
+  variant?: "light" | "digital"
+}) => {
   const toggleState = useToggleState()
+  const menuBtn =
+    variant === "digital"
+      ? "relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none text-neutral-300 hover:text-white"
+      : "relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
 
   return (
     <div className="h-full">
@@ -29,7 +43,7 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
               <div className="relative flex h-full">
                 <Popover.Button
                   data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
+                  className={menuBtn}
                 >
                   Menu
                 </Popover.Button>

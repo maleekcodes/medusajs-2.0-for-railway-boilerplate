@@ -1,0 +1,6 @@
+export { Hero } from './Hero'
+export { Introduction } from './Introduction'
+export { Collection } from './Collection'
+export { Philosophy } from './Philosophy'
+export { ARFitSection } from './ARFitSection'
+export { PrivateGate } from './PrivateGate'

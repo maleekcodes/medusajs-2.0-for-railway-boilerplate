@@ -1,41 +1,56 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import {
+  enrichLineItems,
+  retrieveCart,
+  transferCartToSessionCustomer,
+} from "@lib/data/cart"
 import Wrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
-import { enrichLineItems, retrieveCart } from "@lib/data/cart"
+import { Container } from "@modules/common/components/xyz/Container"
 import { HttpTypes } from "@medusajs/types"
 import { getCustomer } from "@lib/data/customer"
 
 export const metadata: Metadata = {
-  title: "Checkout",
+  title: "Checkout | XYZ London",
+  description:
+    "Complete your XYZ London order — shipping and secure payment.",
+  robots: { index: false, follow: false },
 }
 
-const fetchCart = async () => {
-  const cart = await retrieveCart()
+async function prepareCheckout() {
+  const customer = await getCustomer()
+  let cart = await retrieveCart()
   if (!cart) {
-    return notFound()
+    notFound()
   }
 
-  if (cart?.items?.length) {
-    const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id!)
+  if (customer) {
+    await transferCartToSessionCustomer()
+    cart = (await retrieveCart()) ?? cart
+  }
+
+  if (cart.items?.length) {
+    const enrichedItems = await enrichLineItems(cart.items, cart.region_id!)
     cart.items = enrichedItems as HttpTypes.StoreCartLineItem[]
   }
 
-  return cart
+  return { cart, customer }
 }
 
 export default async function Checkout() {
-  const cart = await fetchCart()
-  const customer = await getCustomer()
+  const { cart, customer } = await prepareCheckout()
 
   return (
-    <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
-      <Wrapper cart={cart}>
-        <CheckoutForm cart={cart} customer={customer} />
-      </Wrapper>
-      <CheckoutSummary cart={cart} />
-    </div>
+    <Container className="pb-24 pt-12 md:pt-16">
+      <div className="grid grid-cols-1 gap-x-12 gap-y-12 lg:grid-cols-[1fr_min(100%,380px)] lg:gap-x-16 xl:gap-x-20">
+        <Wrapper cart={cart}>
+          <CheckoutForm cart={cart} customer={customer} />
+        </Wrapper>
+        <CheckoutSummary cart={cart} />
+      </div>
+    </Container>
   )
 }
