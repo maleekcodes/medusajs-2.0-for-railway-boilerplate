@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@medusajs/ui"
+import dynamic from "next/dynamic"
 import { isEqual } from "lodash"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -11,6 +12,12 @@ import OptionSelect from "@modules/products/components/product-actions/option-se
 
 import MobileActions from "./mobile-actions"
 import ProductPrice from "../product-price"
+
+const PhysicalProductTryOn = dynamic(
+  () =>
+    import("./physical-product-try-on").then((m) => m.PhysicalProductTryOn),
+  { ssr: false }
+)
 import { addToCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 
@@ -18,6 +25,8 @@ type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
+  /** Set from server via env; avoids client-only feature detection that can miss on cold loads. */
+  tryOnEnabled: boolean
 }
 
 const optionsAsKeymap = (variantOptions: any) => {
@@ -33,6 +42,7 @@ export default function ProductActions({
   product,
   region,
   disabled,
+  tryOnEnabled,
 }: ProductActionsProps) {
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
@@ -113,7 +123,16 @@ export default function ProductActions({
   return (
     <>
       <div className="flex flex-col gap-y-6" ref={actionsRef}>
-        <ProductPrice product={product} variant={selectedVariant} />
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <ProductPrice product={product} variant={selectedVariant} />
+          </div>
+          <PhysicalProductTryOn
+            enabled={tryOnEnabled}
+            product={product}
+            countryCode={countryCode}
+          />
+        </div>
 
         {(product.variants?.length ?? 0) > 1 && (
           <div className="flex flex-col gap-y-5">

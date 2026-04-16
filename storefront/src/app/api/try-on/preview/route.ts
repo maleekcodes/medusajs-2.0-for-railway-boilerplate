@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { assertProductImageForTryon } from "@lib/digital/load-product-for-api"
+import { assertTryOnProductResolvable } from "@lib/digital/load-product-for-api"
 import { normalizeDigitalPdpSlug } from "@lib/digital/normalize-digital-slug"
 import {
-  digitalTryonObjectKey,
   getTryonObjectBuffer,
   isMinioConfigured,
+  tryonObjectKeyFromSlug,
 } from "@lib/digital/minio-server"
 import { verifyPreviewSignature } from "@lib/digital/preview-token"
 import { renderTryonPreviewJpeg } from "@lib/digital/render-tryon-preview"
@@ -38,12 +38,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    await assertProductImageForTryon(slug)
+    await assertTryOnProductResolvable(slug)
   } catch {
     return new NextResponse("Not found", { status: 404 })
   }
 
-  const key = digitalTryonObjectKey(slug, id)
+  const key = tryonObjectKeyFromSlug(slug, id)
   const raw = await getTryonObjectBuffer(key)
   if (!raw?.length) {
     return new NextResponse("Not found", { status: 404 })

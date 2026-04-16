@@ -1,5 +1,6 @@
 import React, { Suspense } from "react"
 
+import { getVirtualTryOnApiKey } from "@lib/digital/virtual-tryon-config"
 import { Container } from "@modules/common/components/xyz/Container"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductDetailAccordions from "@modules/products/components/product-detail-accordions"
@@ -27,6 +28,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     return notFound()
   }
 
+  const tryOnEnabled = Boolean(getVirtualTryOnApiKey())
+
   return (
     <>
       <div
@@ -53,10 +56,15 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                     disabled={true}
                     product={product}
                     region={region}
+                    tryOnEnabled={tryOnEnabled}
                   />
                 }
               >
-                <ProductActionsWrapper id={product.id} region={region} />
+                <ProductActionsWrapper
+                  id={product.id}
+                  region={region}
+                  tryOnEnabled={tryOnEnabled}
+                />
               </Suspense>
             </aside>
           </div>

@@ -38,18 +38,20 @@ export default function NavChrome({
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${header}`}
     >
-      <div className="grid grid-cols-3 items-center h-16 px-6 md:px-12 max-w-7xl mx-auto">
-        <nav className="hidden md:flex gap-8 text-sm font-medium tracking-wide">
-          <LocalizedClientLink href="/store" className={link}>
-            Physical Form
-          </LocalizedClientLink>
-          <LocalizedClientLink href="/digital" className={link}>
-            Digital Form
-          </LocalizedClientLink>
-        </nav>
+      <div className="grid w-full grid-cols-3 items-center h-16 px-6 md:px-12 max-w-[90rem] mx-auto">
+        <div className="flex min-w-0 items-center justify-start">
+          <nav className="hidden md:flex gap-8 text-sm font-medium tracking-wide">
+            <LocalizedClientLink href="/store" className={link}>
+              Physical Form
+            </LocalizedClientLink>
+            <LocalizedClientLink href="/digital" className={link}>
+              Digital Form
+            </LocalizedClientLink>
+          </nav>
 
-        <div className="md:hidden h-full flex items-center">
-          <SideMenu regions={regions} variant={digital ? "digital" : "light"} />
+          <div className="md:hidden flex h-full items-center">
+            <SideMenu regions={regions} variant={digital ? "digital" : "light"} />
+          </div>
         </div>
 
         <div className="flex justify-center">
@@ -62,37 +64,45 @@ export default function NavChrome({
           </LocalizedClientLink>
         </div>
 
-        <nav className="hidden md:flex justify-end items-center gap-8 text-sm font-medium tracking-wide">
-          <LocalizedClientLink href="/about" className={link}>
-            About
-          </LocalizedClientLink>
-          <LocalizedClientLink href="/journal" className={link}>
-            Journal
-          </LocalizedClientLink>
-          <LocalizedClientLink href="/ar-fit" className={link}>
-            AR Fit
-          </LocalizedClientLink>
-          {process.env.NEXT_PUBLIC_FEATURE_SEARCH_ENABLED && (
-            <LocalizedClientLink
-              href="/search"
-              className={link}
-              scroll={false}
-              data-testid="nav-search-link"
-            >
-              Search
+        <div className="flex min-w-0 items-center justify-end">
+          <nav className="hidden md:flex min-w-0 justify-end items-center gap-5 lg:gap-8 text-sm font-medium tracking-wide flex-nowrap whitespace-nowrap [&_a]:shrink-0">
+            <LocalizedClientLink href="/about" className={link}>
+              About
             </LocalizedClientLink>
-          )}
-          <LocalizedClientLink
-            href="/account"
-            className={link}
-            data-testid="nav-account-link"
-          >
-            Account
-          </LocalizedClientLink>
-          {cartDesktop}
-        </nav>
-
-        <div className="md:hidden flex justify-end">{cartMobile}</div>
+            <LocalizedClientLink href="/journal" className={link}>
+              Journal
+            </LocalizedClientLink>
+            <LocalizedClientLink href="/virtual-try-on" className={link}>
+              Try-on
+            </LocalizedClientLink>
+            <LocalizedClientLink
+              href="/private-expressions"
+              className={link}
+              data-testid="nav-ooo-link"
+            >
+              OOO
+            </LocalizedClientLink>
+            {process.env.NEXT_PUBLIC_FEATURE_SEARCH_ENABLED && (
+              <LocalizedClientLink
+                href="/search"
+                className={link}
+                scroll={false}
+                data-testid="nav-search-link"
+              >
+                Search
+              </LocalizedClientLink>
+            )}
+            <LocalizedClientLink
+              href="/account"
+              className={link}
+              data-testid="nav-account-link"
+            >
+              Account
+            </LocalizedClientLink>
+            {cartDesktop}
+          </nav>
+          <div className="flex md:hidden justify-end">{cartMobile}</div>
+        </div>
       </div>
     </header>
   )

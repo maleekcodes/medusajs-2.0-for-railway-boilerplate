@@ -196,7 +196,7 @@ const siteSettings = {
   },
 }
 
-// Home Page - migrated from Hero.tsx, Introduction.tsx, Philosophy.tsx, ARFitSection.tsx, PrivateGate.tsx
+// Home Page - migrated from Hero.tsx, Introduction.tsx, Philosophy.tsx, VirtualTryOnSection.tsx, PrivateGate.tsx
 const homePage = {
   _id: 'homePage',
   _type: 'homePage',
@@ -218,11 +218,12 @@ const homePage = {
     'The greatest discoveries are always found in the unknown.',
   ],
   philosophyCtaLabel: 'DIGITAL FORM PREVIEW',
-  // AR Fit Section - v1 style
-  arFitLabel: 'System v1.0',
-  arFitTitle: 'Find your XYZ size & fit.',
-  arFitParagraph: 'XYZ London does not size by gender. We size by body structure, movement, and proportion. Our sizing system is built on Architectural Fluidity.',
-  arFitCtaLabel: 'Start Fit Analysis',
+  // Try-on section
+  arFitLabel: 'Try-on',
+  arFitTitle: 'See it on you—garments and digital pieces.',
+  arFitParagraph:
+    'Try-on helps you decide with more context: upload a photo on eligible physical or digital product pages and we composite the piece onto you. A clearer starting point online than catalog shots alone.',
+  arFitCtaLabel: 'How it works',
   // Private Gate - v1 dark style
   privateGateTitle: 'Private Expressions',
   privateGateParagraph: 'Our expressions are not publicly offered. Access is limited and reviewed over time.',
@@ -272,30 +273,34 @@ const aboutPage = {
   seoDescription: 'Learn about XYZ London - a fashion house exploring identity through physical and digital expression.',
 }
 
-// AR Fit Page - migrated from ARFitPage.tsx (v1 full content)
+// Try-on page — Sanity document (storefront uses Next.js template at /virtual-try-on)
 const arFitPage = {
   _id: 'arFitPage',
   _type: 'arFitPage',
-  label: 'System v1.0',
-  title: 'FIND YOUR PERFECT FIT.',
-  subtitle: 'Instant sizing analysis based on your unique structure.',
-  subtitleLine2: 'No measuring tapes. No gender categories. Just form.',
-  ctaLabel: 'Start Fit Analysis',
-  philosophyHeadline: "We don't classify bodies.",
-  philosophyHeadlineLine2: 'We design systems that adapt to them.',
-  philosophyParagraph1: 'XYZ London does not size by gender. Our sizing system is built on Architectural Fluidity: a technical approach that uses volume, drape, and internal structure to allow garments to adapt naturally to different frames.',
-  philosophyParagraph2: 'Rather than assigning identity through size labels, we invite individuals to choose how they wish to reveal their form. Fit becomes an expression, not a prescription.',
-  stepsHeading: 'The Analysis Process',
+  label: 'Try-on',
+  title: 'SEE IT ON YOU FIRST.',
+  subtitle: 'Physical garments and digital expressions—upload a photo, get a composite preview,',
+  subtitleLine2: 'and decide with more context than flat photos alone.',
+  ctaLabel: 'Physical collection',
+  philosophyHeadline: 'What try-on does',
+  philosophyHeadlineLine2: 'for you',
+  philosophyParagraph1:
+    'You see the piece on your frame, not only on a model. The same upload-and-preview flow applies on eligible physical PDPs and digital expression pages where enabled.',
+  philosophyParagraph2:
+    'Use the preview to shortlist, compare, or feel more confident at checkout—especially when you can’t visit in person first.',
+  stepsHeading: 'How it works',
   steps: [
-    { _key: 'step-1', id: '01', title: 'Scan Structure', description: 'Camera-assisted analysis maps your key structural points.', shape: 'circle' },
-    { _key: 'step-2', id: '02', title: 'Compute Fit', description: 'Matches your volumetric data to our architectural patterns.', shape: 'hexagon' },
-    { _key: 'step-3', id: '03', title: 'Visualize', description: 'See the garment on your form in AR before you acquire.', shape: 'rhombus' },
+    { _key: 'step-1', id: '01', title: 'Upload a photo', description: 'On any product where try-on is available—physical or digital—choose a clear, well-lit picture.', shape: 'circle' },
+    { _key: 'step-2', id: '02', title: 'Get a composite preview', description: 'The piece is rendered onto your image so you can judge proportion and presence.', shape: 'hexagon' },
+    { _key: 'step-3', id: '03', title: 'Decide with more context', description: 'Add a garment to your bag, or complete checkout on a digital work, with a clearer preview than imagery alone.', shape: 'rhombus' },
   ],
-  privacyBadge: 'Privacy Encrypted',
-  privacyText: 'This experience analyses form and proportion only. No images or body data are stored on our servers.',
-  versionLabel: 'System v1.0 (Beta)',
-  seoTitle: 'AR Fit | XYZ London',
-  seoDescription: 'Experience our collection in augmented reality. Try before you buy.',
+  privacyBadge: 'Privacy-minded',
+  privacyText:
+    'Try-on uses your photo to generate a preview via our partner service. We don’t use it for marketing or sell your data.',
+  versionLabel: 'Availability varies by product and region.',
+  seoTitle: 'Try-on | XYZ London',
+  seoDescription:
+    'How XYZ try-on works for physical and digital pieces: upload a photo, preview the composite, shop with more context.',
 }
 
 // Digital Form Page - migrated from DigitalForm.tsx (v1 full content)
@@ -434,13 +439,13 @@ async function seedAboutPage() {
 }
 
 async function seedArFitPage() {
-  console.log('\n--- Seeding AR Fit Page ---')
+  console.log('\n--- Seeding Try-on page ---')
 
   try {
     await client.createOrReplace(arFitPage)
-    console.log(`  [OK] AR Fit Page`)
+    console.log(`  [OK] Try-on page`)
   } catch (error) {
-    console.error(`  [FAIL] AR Fit Page:`, error)
+    console.error(`  [FAIL] Try-on page:`, error)
   }
 }
 
@@ -488,7 +493,7 @@ async function main() {
   console.log(`  - Site Settings: 1`)
   console.log(`  - Home Page: 1`)
   console.log(`  - About Page: 1`)
-  console.log(`  - AR Fit Page: 1`)
+  console.log(`  - Try-on page: 1`)
   console.log(`  - Digital Form Page: 1`)
   console.log(`\nTotal documents: ${totalDocuments}`)
   console.log(`Time: ${elapsed}s`)

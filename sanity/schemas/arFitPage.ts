@@ -2,7 +2,7 @@ import { defineType, defineField } from 'sanity'
 
 export default defineType({
   name: 'arFitPage',
-  title: 'AR Fit Page',
+  title: 'Try-on page',
   type: 'document',
   fields: [
     // Page Header
@@ -158,8 +158,8 @@ export default defineType({
   preview: {
     prepare() {
       return {
-        title: 'AR Fit Page',
-        subtitle: 'Augmented Reality Fit Analysis',
+        title: 'Try-on page',
+        subtitle: 'Product preview on your photo',
       }
     },
   },

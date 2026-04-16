@@ -8,6 +8,8 @@ import {
 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
+import { parsePhysicalTryonSlugKey } from "./physical-tryon-slug"
+
 function parseEndpoint(): string | null {
   const raw =
     process.env.MINIO_SERVER_URL?.trim() ||
@@ -63,6 +65,25 @@ export function digitalTryonObjectKey(
 ): string {
   const safeSlug = slug.replace(/[^a-z0-9-_]/gi, "")
   return `digital-tryon/${safeSlug}/${predictionId}.png`
+}
+
+export function physicalTryonObjectKey(
+  countryCode: string,
+  handle: string,
+  predictionId: string
+): string {
+  const cc = countryCode.toLowerCase().replace(/[^a-z]/g, "").slice(0, 2) || "us"
+  const safeHandle = handle.replace(/[^a-z0-9-_]/gi, "")
+  return `physical-tryon/${cc}/${safeHandle}/${predictionId}.png`
+}
+
+/** Resolve MinIO object key from try-on slug (digital Sanity slug vs `pt-{cc}-{handle}`). */
+export function tryonObjectKeyFromSlug(slug: string, predictionId: string): string {
+  const p = parsePhysicalTryonSlugKey(slug)
+  if (p) {
+    return physicalTryonObjectKey(p.countryCode, p.handle, predictionId)
+  }
+  return digitalTryonObjectKey(slug, predictionId)
 }
 
 export async function putTryonImageFromUrl(

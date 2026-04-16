@@ -206,10 +206,6 @@ export function DigitalFormClient({
   products: DigitalFormProductDisplay[]
   fetchError?: boolean
 }) {
-  const featured = products.filter((p) => p.isFeatured)
-  const regular = products.filter((p) => !p.isFeatured && !p.isComingSoon)
-  const comingSoon = products.filter((p) => p.isComingSoon)
-
   return (
     <div className="pt-32 pb-24 bg-deepBlack text-white min-h-screen">
       <Container>
@@ -237,48 +233,11 @@ export function DigitalFormClient({
           </p>
         </motion.div>
 
-        <>
-          {featured.length > 0 ? (
-            <section className="mb-16">
-              <h2 className="text-sm font-mono text-blue-400 uppercase tracking-widest mb-8">
-                Featured
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {featured.map((product) => (
-                  <DigitalProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {regular.length > 0 ? (
-            <section className="mb-16">
-              {featured.length > 0 ? (
-                <h2 className="text-sm font-mono text-neutral-500 uppercase tracking-widest mb-8">
-                  Collection
-                </h2>
-              ) : null}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {regular.map((product) => (
-                  <DigitalProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {comingSoon.length > 0 ? (
-            <section className="pt-16 border-t border-neutral-800">
-              <h2 className="text-sm font-mono text-blue-400 uppercase tracking-widest mb-8">
-                Coming Soon
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                {comingSoon.map((product) => (
-                  <DigitalProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </section>
-          ) : null}
-        </>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {products.map((product) => (
+            <DigitalProductCard key={product.id} product={product} />
+          ))}
+        </div>
       </Container>
     </div>
   )

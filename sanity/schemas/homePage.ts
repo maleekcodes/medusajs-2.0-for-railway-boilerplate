@@ -118,29 +118,29 @@ export default defineType({
       of: [{ type: 'string' }],
     }),
 
-    // AR Fit Section
+    // Try-on section (field ids unchanged for existing content)
     defineField({
       name: 'arFitLabel',
-      title: 'AR Fit Section Label',
+      title: 'Try-on — label',
       type: 'string',
-      description: 'e.g., "Technology"',
+      description: 'e.g., "Try-on"',
     }),
     defineField({
       name: 'arFitTitle',
-      title: 'AR Fit Section Title',
+      title: 'Try-on — title',
       type: 'string',
     }),
     defineField({
       name: 'arFitParagraph',
-      title: 'AR Fit Section Paragraph',
+      title: 'Try-on — paragraph',
       type: 'text',
       rows: 4,
     }),
     defineField({
       name: 'arFitCtaLabel',
-      title: 'AR Fit CTA Label',
+      title: 'Try-on — CTA label',
       type: 'string',
-      description: 'e.g., "Try AR Fit"',
+      description: 'e.g., "How it works"',
     }),
 
     // Private Gate Section
@@ -176,7 +176,7 @@ export default defineType({
     prepare() {
       return {
         title: 'Home Page',
-        subtitle: 'Hero, Introduction, Philosophy, AR Fit, Private Gate',
+        subtitle: 'Hero, Introduction, Philosophy, Try-on, Private Gate',
       }
     },
   },

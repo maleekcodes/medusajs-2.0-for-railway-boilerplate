@@ -6,7 +6,7 @@ import { Hero } from "@modules/home/components/xyz/Hero"
 import { Introduction } from "@modules/home/components/xyz/Introduction"
 import { Collection } from "@modules/home/components/xyz/Collection"
 import { Philosophy } from "@modules/home/components/xyz/Philosophy"
-import { ARFitSection } from "@modules/home/components/xyz/ARFitSection"
+import { VirtualTryOnSection } from "@modules/home/components/xyz/VirtualTryOnSection"
 import { PrivateGate } from "@modules/home/components/xyz/PrivateGate"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
@@ -70,8 +70,8 @@ export default async function Home({
       <div id="digital">
         <Philosophy />
       </div>
-      <div id="fit">
-        <ARFitSection />
+      <div id="virtual-try-on">
+        <VirtualTryOnSection />
       </div>
       <div id="private">
         <PrivateGate />

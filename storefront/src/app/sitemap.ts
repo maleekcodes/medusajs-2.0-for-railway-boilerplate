@@ -16,7 +16,7 @@ const STATIC_PATHS: Entry[] = [
   { path: "/about", changeFrequency: "monthly", priority: 0.9 },
   { path: "/store", changeFrequency: "weekly", priority: 0.9 },
   { path: "/digital", changeFrequency: "weekly", priority: 0.9 },
-  { path: "/ar-fit", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/virtual-try-on", changeFrequency: "monthly", priority: 0.85 },
   { path: "/journal", changeFrequency: "weekly", priority: 0.85 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.7 },
   { path: "/private-expressions", changeFrequency: "monthly", priority: 0.6 },

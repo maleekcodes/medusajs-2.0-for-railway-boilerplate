@@ -1,13 +1,11 @@
-import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 
-import ARFitTemplate from "@modules/ar-fit/templates/ar-fit-template"
-
-export const metadata: Metadata = {
-  title: "AR Fit | XYZ London",
-  description:
-    "Experience our collection in augmented reality. Try before you buy.",
+type Props = {
+  params: Promise<{ countryCode: string }>
 }
 
-export default function ARFitPage() {
-  return <ARFitTemplate />
+/** @deprecated Use `/virtual-try-on` — kept for bookmarks and external links. */
+export default async function ARFitLegacyRedirect({ params }: Props) {
+  const { countryCode } = await params
+  redirect(`/${countryCode}/virtual-try-on`)
 }

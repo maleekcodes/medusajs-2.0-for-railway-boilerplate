@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { assertProductImageForTryon } from "@lib/digital/load-product-for-api"
+import {
+  assertMedusaProductImageForTryon,
+  assertProductImageForTryon,
+} from "@lib/digital/load-product-for-api"
 import { normalizeDigitalPdpSlug } from "@lib/digital/normalize-digital-slug"
+import { imageUrlForTryOnProvider } from "@lib/digital/try-on-image-for-provider"
 import {
   getVirtualTryOnApiKey,
   getVirtualTryOnProviderBaseUrl,
@@ -12,6 +16,8 @@ export const maxDuration = 60
 
 type Body = {
   slug?: string
+  productHandle?: string
+  countryCode?: string
   modelImage?: string
 }
 
@@ -19,7 +25,7 @@ export async function POST(request: Request) {
   const apiKey = getVirtualTryOnApiKey()
   if (!apiKey) {
     return NextResponse.json(
-      { error: "Virtual try-on is not configured" },
+      { error: "Try-on is not configured" },
       { status: 503 }
     )
   }
@@ -31,11 +37,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
   }
 
-  const slug = normalizeDigitalPdpSlug(body.slug?.trim() || "")
   const modelImage = body.modelImage?.trim()
-  if (!slug || !modelImage) {
+  const slugRaw = body.slug?.trim() || ""
+  const productHandle = body.productHandle?.trim()
+  const countryCode = body.countryCode?.trim()
+
+  const hasDigital = !!normalizeDigitalPdpSlug(slugRaw)
+  const hasPhysical = !!(productHandle && countryCode)
+
+  if (!modelImage || (!hasDigital && !hasPhysical) || (hasDigital && hasPhysical)) {
     return NextResponse.json(
-      { error: "slug and modelImage are required" },
+      {
+        error:
+          "Provide exactly one of: (slug + modelImage) for digital, or (productHandle + countryCode + modelImage) for physical",
+      },
       { status: 400 }
     )
   }
@@ -54,11 +69,33 @@ export async function POST(request: Request) {
   }
 
   let productImageUrl: string
+  let tryonSlug: string | undefined
+
   try {
-    const res = await assertProductImageForTryon(slug)
-    productImageUrl = res.productImageUrl
+    if (hasPhysical) {
+      const res = await assertMedusaProductImageForTryon(
+        productHandle!,
+        countryCode!
+      )
+      productImageUrl = res.productImageUrl
+      tryonSlug = res.slugKey
+    } else {
+      const slug = normalizeDigitalPdpSlug(slugRaw)
+      const res = await assertProductImageForTryon(slug)
+      productImageUrl = res.productImageUrl
+      tryonSlug = slug
+    }
   } catch {
     return NextResponse.json({ error: "Product not found" }, { status: 404 })
+  }
+
+  let productImageForProvider: string
+  try {
+    productImageForProvider = await imageUrlForTryOnProvider(productImageUrl)
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : "Could not prepare product image for try-on"
+    return NextResponse.json({ error: message }, { status: 502 })
   }
 
   const runRes = await fetch(`${getVirtualTryOnProviderBaseUrl()}/run`, {
@@ -70,7 +107,7 @@ export async function POST(request: Request) {
     body: JSON.stringify({
       model_name: "tryon-max",
       inputs: {
-        product_image: productImageUrl,
+        product_image: productImageForProvider,
         model_image: modelImage,
       },
     }),
@@ -93,12 +130,16 @@ export async function POST(request: Request) {
     )
   }
 
-  if (!payload.id || typeof payload.error === "string") {
-    return NextResponse.json(
-      { error: payload.error || "No prediction id returned" },
-      { status: 502 }
-    )
+  if (!payload.id) {
+    const err =
+      typeof payload.error === "string" && payload.error.trim()
+        ? payload.error.trim()
+        : "No prediction id returned"
+    return NextResponse.json({ error: err }, { status: 502 })
   }
 
-  return NextResponse.json({ predictionId: payload.id })
+  return NextResponse.json({
+    predictionId: payload.id,
+    ...(tryonSlug ? { tryonSlug } : {}),
+  })
 }

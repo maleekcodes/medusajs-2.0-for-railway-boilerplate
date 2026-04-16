@@ -81,6 +81,7 @@ const CartDropdown = ({
         <Popover.Button className="h-full">
           <LocalizedClientLink
             className={clx(
+              "whitespace-nowrap",
               digitalNav
                 ? "text-neutral-300 hover:text-white"
                 : "hover:text-ui-fg-base"

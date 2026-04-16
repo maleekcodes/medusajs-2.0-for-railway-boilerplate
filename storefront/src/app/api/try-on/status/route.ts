@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 
-import { assertProductImageForTryon } from "@lib/digital/load-product-for-api"
+import { assertTryOnProductResolvable } from "@lib/digital/load-product-for-api"
 import { normalizeDigitalPdpSlug } from "@lib/digital/normalize-digital-slug"
 import {
-  digitalTryonObjectKey,
   isMinioConfigured,
   putTryonImageFromUrl,
   tryonObjectExists,
+  tryonObjectKeyFromSlug,
 } from "@lib/digital/minio-server"
 import { issueSignedPreviewPath } from "@lib/digital/preview-token"
 import {
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
   const apiKey = getVirtualTryOnApiKey()
   if (!apiKey) {
     return NextResponse.json(
-      { error: "Virtual try-on is not configured" },
+      { error: "Try-on is not configured" },
       { status: 503 }
     )
   }
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    await assertProductImageForTryon(slug)
+    await assertTryOnProductResolvable(slug)
   } catch {
     return NextResponse.json({ error: "Product not found" }, { status: 404 })
   }
@@ -70,15 +70,22 @@ export async function GET(request: Request) {
   const status = data.status ?? "unknown"
   const output = Array.isArray(data.output) ? data.output : []
 
-  if (status === "failed" || data.error) {
+  // Only treat the job as failed when the provider reports a failed status.
+  // Some payloads may include an `error` field even while processing; gating on
+  // `data.error` alone caused HTTP 200 responses that looked like hard failures.
+  if (status === "failed") {
+    const err =
+      typeof data.error === "string" && data.error.trim()
+        ? data.error.trim()
+        : "Try-on failed"
     return NextResponse.json({
       status: "failed",
-      error: typeof data.error === "string" ? data.error : "Try-on failed",
+      error: err,
     })
   }
 
   if (status === "completed" && output[0]) {
-    const key = digitalTryonObjectKey(slug, id)
+    const key = tryonObjectKeyFromSlug(slug, id)
     if (isMinioConfigured()) {
       const exists = await tryonObjectExists(key)
       if (!exists) {

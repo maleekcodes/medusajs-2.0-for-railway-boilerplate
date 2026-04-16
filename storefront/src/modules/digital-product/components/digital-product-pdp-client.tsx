@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { useCallback, useState } from "react"
 
+import { compressImageDataUrl, fileToDataUrl } from "@lib/util/client-image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { DigitalProductGallery } from "./digital-product-gallery"
 import type { DigitalProductDetailSanity } from "@/types/xyz"
@@ -13,53 +14,6 @@ type PollState =
   | { phase: "polling"; label: string }
   | { phase: "done" }
   | { phase: "error"; message: string }
-
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        resolve(reader.result)
-      } else {
-        reject(new Error("Could not read file"))
-      }
-    }
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
-}
-
-async function compressImageDataUrl(
-  dataUrl: string,
-  maxDim = 1280,
-  quality = 0.85
-): Promise<string> {
-  if (typeof document === "undefined") {
-    return dataUrl
-  }
-  const img = new Image()
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve()
-    img.onerror = () => reject(new Error("Image load failed"))
-    img.src = dataUrl
-  })
-  let { width, height } = img
-  if (width <= maxDim && height <= maxDim) {
-    return dataUrl
-  }
-  const scale = maxDim / Math.max(width, height)
-  width = Math.round(width * scale)
-  height = Math.round(height * scale)
-  const canvas = document.createElement("canvas")
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext("2d")
-  if (!ctx) {
-    return dataUrl
-  }
-  ctx.drawImage(img, 0, 0, width, height)
-  return canvas.toDataURL("image/jpeg", quality)
-}
 
 type Props = {
   product: DigitalProductDetailSanity
@@ -365,12 +319,43 @@ export function DigitalProductPdpClient({
                       key="idle"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center"
+                      className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-5 sm:p-6 text-center overflow-y-auto"
                     >
-                      <p className="text-sm text-neutral-500">
-                        Upload a photo to see it on you next to the product.
-                      </p>
-                      <label className="cursor-pointer">
+                      <div className="max-w-sm space-y-4 text-left">
+                        <p className="text-sm text-neutral-400 leading-relaxed">
+                          Upload a photo and we&apos;ll composite this piece onto
+                          you for a reference preview—the same flow as our
+                          physical garments.{" "}
+                          <LocalizedClientLink
+                            href="/virtual-try-on"
+                            className="text-blue-400 underline-offset-2 hover:underline"
+                          >
+                            How try-on works
+                          </LocalizedClientLink>
+                        </p>
+                        <div>
+                          <p className="text-[10px] font-mono uppercase tracking-widest text-neutral-500 mb-2">
+                            Get the best result
+                          </p>
+                          <ul className="text-xs text-neutral-500 leading-relaxed space-y-1.5 list-disc list-inside marker:text-neutral-600">
+                            <li>
+                              Face the camera straight on; keep your head and
+                              shoulders in frame.
+                            </li>
+                            <li>
+                              Use bright, even light—natural daylight or a
+                              softly lit room. Avoid strong backlight or deep
+                              shadow on your face.
+                            </li>
+                            <li>
+                              Hold the camera steady and keep the shot sharp;
+                              plain backgrounds usually read more clearly.
+                            </li>
+                            <li>JPG or PNG works best.</li>
+                          </ul>
+                        </div>
+                      </div>
+                      <label className="cursor-pointer shrink-0">
                         <input
                           type="file"
                           accept="image/*"
