@@ -4,6 +4,9 @@ import type {
   DigitalFormPageSanity,
   DigitalProductDetailSanity,
   JournalEntry,
+  HomePageSanity,
+  AboutPageSanity,
+  ArFitPageSanity,
 } from "@/types/xyz"
 
 import {
@@ -306,5 +309,159 @@ export async function getJournalPost(
   } catch (e) {
     console.error("Sanity journal post fetch error:", e)
     return null
+  }
+}
+
+// ============ Home Page ============
+
+const homePageQuery = `*[_type == "homePage"][0] {
+  heroHeadline,
+  heroSubheadline,
+  heroCta,
+  heroFigureLabels {
+    physical,
+    digital
+  },
+  introLabel,
+  introHeadline,
+  introHeadlineAccent,
+  introParagraph,
+  introText,
+  philosophyTitle,
+  philosophyComingLabel,
+  philosophyParagraph1,
+  philosophyParagraph2,
+  philosophyCtaLabel,
+  manifestoLines,
+  arFitLabel,
+  arFitTitle,
+  arFitParagraph,
+  arFitCtaLabel,
+  privateGateLabel,
+  privateGateTitle,
+  privateGateParagraph,
+  privateGateInputPlaceholder,
+  privateGateButtonLabel
+}`
+
+export type HomePageResult = {
+  page: HomePageSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export async function getHomePage(): Promise<HomePageResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { page: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const page = await client.fetch<HomePageSanity | null>(homePageQuery)
+    return {
+      page: page ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity home page fetch error:", e)
+    return { page: null, sanityConfigured: true, fetchError: true }
+  }
+}
+
+// ============ About Page ============
+
+const aboutPageQuery = `*[_type == "aboutPage"][0] {
+  label,
+  title,
+  leadQuote,
+  bodyParagraphs[] {
+    _key,
+    text,
+    column,
+    isHighlighted
+  },
+  sustainabilityNote,
+  closingLine1,
+  closingLine2,
+  tagline,
+  seoTitle,
+  seoDescription
+}`
+
+export type AboutPageResult = {
+  page: AboutPageSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export async function getAboutPage(): Promise<AboutPageResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { page: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const page = await client.fetch<AboutPageSanity | null>(aboutPageQuery)
+    return {
+      page: page ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity about page fetch error:", e)
+    return { page: null, sanityConfigured: true, fetchError: true }
+  }
+}
+
+// ============ AR Fit (Virtual Try-On) Page ============
+
+const arFitPageQuery = `*[_type == "arFitPage"][0] {
+  label,
+  title,
+  subtitle,
+  subtitleLine2,
+  ctaLabel,
+  philosophyHeadline,
+  philosophyHeadlineLine2,
+  philosophyParagraph1,
+  philosophyParagraph2,
+  stepsHeading,
+  steps[] {
+    _key,
+    id,
+    title,
+    description,
+    shape
+  },
+  privacyBadge,
+  privacyText,
+  versionLabel,
+  seoTitle,
+  seoDescription
+}`
+
+export type ArFitPageResult = {
+  page: ArFitPageSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export async function getArFitPage(): Promise<ArFitPageResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { page: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const page = await client.fetch<ArFitPageSanity | null>(arFitPageQuery)
+    return {
+      page: page ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity AR fit page fetch error:", e)
+    return { page: null, sanityConfigured: true, fetchError: true }
   }
 }

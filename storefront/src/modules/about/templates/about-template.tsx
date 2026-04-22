@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 
 import { Container } from "@modules/common/components/xyz/Container"
+import type { AboutPageSanity } from "@/types/xyz"
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -13,7 +14,68 @@ const itemVariants = {
   },
 }
 
-export default function AboutTemplate() {
+const defaults = {
+  label: "Identity & Form",
+  title: "ABOUT US",
+  leadQuote: "XYZ London is a fashion house built on intent.",
+  bodyLeft: [
+    {
+      text: "In a world of noise, speed, and constant repetition, we choose restraint. We do not chase trends or mass attention. Instead, we focus on form, premium material, and proportion — the quiet elements that shape how identity is expressed.",
+      isHighlighted: false,
+    },
+    {
+      text: "XYZ London exists to uncover identity, not define it.",
+      isHighlighted: true,
+    },
+    {
+      text: "We believe expression emerges through form, movement, and proportion — not labels, not gender, not rules imposed from the outside.",
+      isHighlighted: false,
+    },
+  ],
+  bodyRight: [
+    {
+      text: 'Our garments are designed beyond gender, created to move naturally across different body forms. Each piece is considered for comfort, durability, and longevity — made to be lived in, (not replaced)*.',
+      isHighlighted: false,
+    },
+    {
+      text: "Alongside physical garments, XYZ London explores digital expression. Our virtual designs extend identity beyond physical constraints, allowing form and presence to exist in new spaces without limitation. Physical and digital are not opposites to us — they are parallel expressions of the same philosophy.",
+      isHighlighted: false,
+    },
+  ],
+  sustainabilityNote:
+    "We work with premium sustainable materials and (responsible construction)*, prioritising quality over volume and intention over excess. Every decision is guided by clarity, discipline, and respect for the individual.",
+  closingLine1: "XYZ London is not about fitting in.",
+  closingLine2: "It is about standing as your original self.",
+  tagline: "From the unknown to the known.",
+}
+
+interface AboutTemplateProps {
+  content?: AboutPageSanity
+}
+
+export default function AboutTemplate({ content }: AboutTemplateProps) {
+  const label = content?.label ?? defaults.label
+  const title = content?.title ?? defaults.title
+  const leadQuote = content?.leadQuote ?? defaults.leadQuote
+  const sustainabilityNote =
+    content?.sustainabilityNote ?? defaults.sustainabilityNote
+  const closingLine1 = content?.closingLine1 ?? defaults.closingLine1
+  const closingLine2 = content?.closingLine2 ?? defaults.closingLine2
+  const tagline = content?.tagline ?? defaults.tagline
+
+  const bodyParagraphs = content?.bodyParagraphs ?? []
+  const hasBodyParagraphs = bodyParagraphs.length > 0
+  const leftParagraphs = hasBodyParagraphs
+    ? bodyParagraphs
+        .filter((p) => p.column === "left" || !p.column)
+        .map((p) => ({ text: p.text ?? "", isHighlighted: p.isHighlighted }))
+    : defaults.bodyLeft
+  const rightParagraphs = hasBodyParagraphs
+    ? bodyParagraphs
+        .filter((p) => p.column === "right")
+        .map((p) => ({ text: p.text ?? "", isHighlighted: p.isHighlighted }))
+    : defaults.bodyRight
+
   return (
     <section className="min-h-screen pt-32 pb-24 bg-white text-deepBlack">
       <Container>
@@ -28,10 +90,10 @@ export default function AboutTemplate() {
         >
           <motion.div variants={itemVariants} className="mb-16">
             <span className="text-xs font-mono text-neutral-400 uppercase tracking-widest block mb-4">
-              Identity & Form
+              {label}
             </span>
             <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mb-12">
-              ABOUT US
+              {title}
             </h1>
             <div className="w-full h-px bg-neutral-200" />
           </motion.div>
@@ -41,48 +103,41 @@ export default function AboutTemplate() {
             className="mb-20 pl-0 md:pl-8 border-l-0 md:border-l-4 border-deepBlack"
           >
             <p className="text-2xl md:text-4xl font-light leading-tight">
-              XYZ London is a fashion house built on intent.
+              {leadQuote}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 text-lg text-neutral-600 font-light leading-relaxed">
             <div className="space-y-12">
-              <motion.p variants={itemVariants}>
-                In a world of noise, speed, and constant repetition, we choose
-                restraint. We do not chase trends or mass attention. Instead, we
-                focus on form, premium material, and proportion — the quiet
-                elements that shape how identity is expressed.
-              </motion.p>
-              <motion.p
-                variants={itemVariants}
-                className="text-deepBlack font-medium text-xl"
-              >
-                XYZ London exists to uncover identity, not define it.
-              </motion.p>
-              <motion.p variants={itemVariants}>
-                We believe expression emerges through form, movement, and
-                proportion — not labels, not gender, not rules imposed from the
-                outside.
-              </motion.p>
+              {leftParagraphs.map((para, idx) => (
+                <motion.p
+                  key={idx}
+                  variants={itemVariants}
+                  className={
+                    para.isHighlighted
+                      ? "text-deepBlack font-medium text-xl"
+                      : ""
+                  }
+                >
+                  {para.text}
+                </motion.p>
+              ))}
             </div>
 
             <div className="space-y-12">
-              <motion.p variants={itemVariants}>
-                Our garments are designed beyond gender, created to move
-                naturally across different body forms. Each piece is considered
-                for comfort, durability, and longevity — made to be lived in,{" "}
-                <span className="inline-block font-mono text-xs text-deepBlack bg-neutral-100 px-2 py-1 rounded mx-1 transform -translate-y-0.5">
-                  (not replaced)*
-                </span>
-                .
-              </motion.p>
-              <motion.p variants={itemVariants}>
-                Alongside physical garments, XYZ London explores digital
-                expression. Our virtual designs extend identity beyond physical
-                constraints, allowing form and presence to exist in new spaces
-                without limitation. Physical and digital are not opposites to us
-                — they are parallel expressions of the same philosophy.
-              </motion.p>
+              {rightParagraphs.map((para, idx) => (
+                <motion.p
+                  key={idx}
+                  variants={itemVariants}
+                  className={
+                    para.isHighlighted
+                      ? "text-deepBlack font-medium text-xl"
+                      : ""
+                  }
+                >
+                  {para.text}
+                </motion.p>
+              ))}
             </div>
           </div>
 
@@ -94,13 +149,7 @@ export default function AboutTemplate() {
               <div className="w-24 h-24 border border-deepBlack rounded-full" />
             </div>
             <p className="text-base md:text-lg text-neutral-700 relative z-10">
-              We work with premium sustainable materials and{" "}
-              <span className="inline-block font-mono text-xs text-deepBlack bg-white border border-neutral-300 px-2 py-1 rounded mx-1 align-middle">
-                (responsible construction)*
-              </span>
-              , prioritising quality over volume and intention over excess.
-              Every decision is guided by clarity, discipline, and respect for
-              the individual.
+              {sustainabilityNote}
             </p>
           </motion.div>
 
@@ -109,17 +158,15 @@ export default function AboutTemplate() {
             className="mt-32 text-center flex flex-col items-center"
           >
             <p className="text-xl md:text-2xl text-deepBlack uppercase tracking-[0.2em] font-medium mb-4">
-              XYZ London is not about fitting in.
+              {closingLine1}
             </p>
             <p className="text-xl md:text-2xl uppercase tracking-[0.2em] font-medium text-neutral-400">
-              It is about standing as your original self.
+              {closingLine2}
             </p>
 
             <div className="h-24 w-px bg-gradient-to-b from-deepBlack to-transparent my-12" />
 
-            <p className="font-mono text-xs text-neutral-400">
-              From the unknown to the known.
-            </p>
+            <p className="font-mono text-xs text-neutral-400">{tagline}</p>
           </motion.div>
         </motion.div>
       </Container>

@@ -12,16 +12,15 @@ import {
 import { Container } from "@modules/common/components/xyz/Container"
 import { Shape } from "@modules/common/components/xyz/Shape"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import type { ShapeType } from "@/types/xyz"
+import type { ShapeType, ArFitPageSanity } from "@/types/xyz"
 
-const steps = [
+const defaultSteps = [
   {
     id: "01",
     title: "Upload a photo",
     description:
       "On any product where try-on is available—physical garments or digital expressions—choose a clear, well-lit picture of yourself.",
     shape: "circle" as ShapeType,
-    icon: Camera,
   },
   {
     id: "02",
@@ -29,7 +28,6 @@ const steps = [
     description:
       "Our partner service renders the piece onto your image so you can judge proportion, silhouette, and overall feel—not a perfect mirror, but a useful reference next to flat product shots.",
     shape: "hexagon" as ShapeType,
-    icon: Sparkles,
   },
   {
     id: "03",
@@ -37,11 +35,42 @@ const steps = [
     description:
       "Use what you see to shortlist, compare, or move forward: add a physical piece to your bag, or complete checkout on a digital work knowing you had a clearer preview than imagery alone.",
     shape: "rhombus" as ShapeType,
-    icon: ShoppingBag,
   },
 ]
 
-export default function VirtualTryOnTemplate() {
+const stepIcons = [Camera, Sparkles, ShoppingBag]
+
+interface VirtualTryOnTemplateProps {
+  content?: ArFitPageSanity
+}
+
+export default function VirtualTryOnTemplate({
+  content,
+}: VirtualTryOnTemplateProps) {
+  const steps =
+    content?.steps && content.steps.length > 0
+      ? content.steps.map((step, idx) => ({
+          id: step.id ?? defaultSteps[idx]?.id ?? `0${idx + 1}`,
+          title: step.title ?? defaultSteps[idx]?.title ?? "",
+          description: step.description ?? defaultSteps[idx]?.description ?? "",
+          shape: (step.shape ??
+            defaultSteps[idx]?.shape ??
+            "circle") as ShapeType,
+          icon: stepIcons[idx] ?? Camera,
+        }))
+      : defaultSteps.map((step, idx) => ({ ...step, icon: stepIcons[idx] }))
+
+  const label = content?.label ?? "Try-on"
+  const title = content?.title ?? "SEE IT ON YOU FIRST."
+  const stepsHeading = content?.stepsHeading ?? "How it works"
+  const privacyBadge = content?.privacyBadge ?? "Privacy-minded"
+  const privacyText =
+    content?.privacyText ??
+    "Your photo is sent to our try-on partner to generate the preview. We don't use it for marketing lists or sell your data—see our Privacy Policy for the full picture."
+  const versionLabel =
+    content?.versionLabel ??
+    "Not every product includes try-on; labels and previews are references, not guarantees of fit or final render quality."
+
   return (
     <div className="pt-32 pb-24 bg-white text-deepBlack min-h-screen">
       <Container>
@@ -52,11 +81,18 @@ export default function VirtualTryOnTemplate() {
           className="mb-20"
         >
           <span className="text-xs font-mono text-neutral-400 uppercase tracking-widest">
-            Try-on
+            {label}
           </span>
           <h1 className="text-5xl md:text-8xl font-bold tracking-tighter mt-4 mb-8">
-            SEE IT ON <br className="hidden md:block" />
-            YOU FIRST.
+            {title.includes("\n") ? (
+              title
+            ) : (
+              <>
+                {title.split(" ").slice(0, 4).join(" ")}{" "}
+                <br className="hidden md:block" />
+                {title.split(" ").slice(4).join(" ")}
+              </>
+            )}
           </h1>
           <p className="max-w-2xl text-xl font-light text-neutral-600 mb-6">
             Try-on is our way to bring you closer to a piece before you commit.
@@ -166,8 +202,12 @@ export default function VirtualTryOnTemplate() {
 
         <section className="mb-32">
           <div className="flex items-end justify-between border-b border-deepBlack pb-4 mb-12">
-            <h2 className="text-3xl font-light tracking-tight">How it works</h2>
-            <span className="font-mono text-xs">01 — 03</span>
+            <h2 className="text-3xl font-light tracking-tight">
+              {stepsHeading}
+            </h2>
+            <span className="font-mono text-xs">
+              01 — {String(steps.length).padStart(2, "0")}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -215,17 +255,14 @@ export default function VirtualTryOnTemplate() {
           <div className="mb-6 flex items-center gap-2 text-green-600 bg-green-50 px-4 py-1.5 rounded-full border border-green-200">
             <ShieldCheck size={14} />
             <span className="text-[10px] font-mono uppercase tracking-widest">
-              Privacy-minded
+              {privacyBadge}
             </span>
           </div>
           <p className="text-neutral-500 max-w-lg mb-8 text-sm font-light">
-            Your photo is sent to our try-on partner to generate the preview. We
-            don&apos;t use it for marketing lists or sell your data—see our
-            Privacy Policy for the full picture.
+            {privacyText}
           </p>
           <span className="text-[10px] font-mono text-neutral-300 uppercase">
-            Not every product includes try-on; labels and previews are references,
-            not guarantees of fit or final render quality.
+            {versionLabel}
           </span>
         </section>
       </Container>

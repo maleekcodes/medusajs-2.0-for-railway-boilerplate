@@ -10,6 +10,7 @@ import { VirtualTryOnSection } from "@modules/home/components/xyz/VirtualTryOnSe
 import { PrivateGate } from "@modules/home/components/xyz/PrivateGate"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
+import { getHomePage } from "@lib/sanity/queries"
 
 export const metadata: Metadata = {
   title: SITE_TITLE_DEFAULT,
@@ -26,12 +27,18 @@ export default async function Home({
   params: Promise<{ countryCode: string }>
 }) {
   const { countryCode } = await params
-  const collections = await getCollectionsWithProducts(countryCode)
-  const region = await getRegion(countryCode)
+
+  const [collections, region, homePageResult] = await Promise.all([
+    getCollectionsWithProducts(countryCode),
+    getRegion(countryCode),
+    getHomePage(),
+  ])
 
   if (!collections || !region) {
     return null
   }
+
+  const page = homePageResult.page
 
   const collectionsWithProducts = collections
     .filter((c) => Array.isArray(c.products) && c.products.length > 0)
@@ -47,10 +54,22 @@ export default async function Home({
   return (
     <>
       <div id="hero">
-        <Hero />
+        <Hero
+          headline={page?.heroHeadline ?? undefined}
+          subheadline={page?.heroSubheadline ?? undefined}
+          cta={page?.heroCta ?? undefined}
+          figureLabels={
+            page?.heroFigureLabels
+              ? {
+                  physical: page.heroFigureLabels.physical ?? undefined,
+                  digital: page.heroFigureLabels.digital ?? undefined,
+                }
+              : undefined
+          }
+        />
       </div>
       <div id="intro">
-        <Introduction />
+        <Introduction text={page?.introText ?? undefined} />
       </div>
       <div id="physical">
         <Collection />
@@ -68,13 +87,25 @@ export default async function Home({
       )}
 
       <div id="digital">
-        <Philosophy />
+        <Philosophy
+          lines={page?.manifestoLines ?? undefined}
+          ctaLabel={page?.philosophyCtaLabel ?? undefined}
+        />
       </div>
       <div id="virtual-try-on">
-        <VirtualTryOnSection />
+        <VirtualTryOnSection
+          label={page?.arFitLabel ?? undefined}
+          title={page?.arFitTitle ?? undefined}
+          paragraph={page?.arFitParagraph ?? undefined}
+          ctaLabel={page?.arFitCtaLabel ?? undefined}
+        />
       </div>
       <div id="private">
-        <PrivateGate />
+        <PrivateGate
+          title={page?.privateGateTitle ?? undefined}
+          paragraph={page?.privateGateParagraph ?? undefined}
+          buttonLabel={page?.privateGateButtonLabel ?? undefined}
+        />
       </div>
     </>
   )

@@ -93,3 +93,96 @@ export type DigitalFormPageSanity = {
   seoDescription?: string | null
   digitalProducts?: DigitalFormProductSanity[] | null
 }
+
+// ============ Page Content Types ============
+
+/** Full home page content from Sanity */
+export type HomePageSanity = {
+  // Hero
+  heroHeadline?: string | null
+  heroSubheadline?: string | null
+  heroCta?: string | null
+  heroFigureLabels?: {
+    physical?: string | null
+    digital?: string | null
+  } | null
+  // Introduction
+  introLabel?: string | null
+  introHeadline?: string | null
+  introHeadlineAccent?: string | null
+  introParagraph?: string | null
+  introText?: string | null
+  // Philosophy
+  philosophyTitle?: string | null
+  philosophyComingLabel?: string | null
+  philosophyParagraph1?: string | null
+  philosophyParagraph2?: string | null
+  philosophyCtaLabel?: string | null
+  manifestoLines?: string[] | null
+  // Try-on section
+  arFitLabel?: string | null
+  arFitTitle?: string | null
+  arFitParagraph?: string | null
+  arFitCtaLabel?: string | null
+  // Private gate
+  privateGateLabel?: string | null
+  privateGateTitle?: string | null
+  privateGateParagraph?: string | null
+  privateGateInputPlaceholder?: string | null
+  privateGateButtonLabel?: string | null
+}
+
+/** About page body paragraph item */
+export type AboutBodyParagraph = {
+  _key?: string
+  text?: string | null
+  column?: "left" | "right" | null
+  isHighlighted?: boolean | null
+}
+
+/** Full about page content from Sanity */
+export type AboutPageSanity = {
+  label?: string | null
+  title?: string | null
+  leadQuote?: string | null
+  bodyParagraphs?: AboutBodyParagraph[] | null
+  sustainabilityNote?: string | null
+  closingLine1?: string | null
+  closingLine2?: string | null
+  tagline?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
+}
+
+/** AR Fit (Virtual Try-On) page step item */
+export type ArFitStep = {
+  _key?: string
+  id?: string | null
+  title?: string | null
+  description?: string | null
+  shape?: ShapeType | null
+}
+
+/** Full AR Fit page content from Sanity */
+export type ArFitPageSanity = {
+  label?: string | null
+  title?: string | null
+  subtitle?: string | null
+  subtitleLine2?: string | null
+  ctaLabel?: string | null
+  // Philosophy section
+  philosophyHeadline?: string | null
+  philosophyHeadlineLine2?: string | null
+  philosophyParagraph1?: string | null
+  philosophyParagraph2?: string | null
+  // Steps
+  stepsHeading?: string | null
+  steps?: ArFitStep[] | null
+  // Privacy
+  privacyBadge?: string | null
+  privacyText?: string | null
+  versionLabel?: string | null
+  // SEO
+  seoTitle?: string | null
+  seoDescription?: string | null
+}
