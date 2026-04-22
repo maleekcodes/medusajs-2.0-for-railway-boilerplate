@@ -2,6 +2,38 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer base {
+  :root {
+    --color-deep-black: #0F0F0F;
+    --color-concrete: #F4F4F4;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-deepBlack antialiased;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+  }
+
+  ::selection {
+    @apply bg-neutral-900 text-white;
+  }
+}
+
+/* Framer Motion SSR fallback - makes content visible if animations don't trigger */
+[style*="opacity: 0"] {
+  animation: fm-fallback 0s 2s forwards;
+}
+
+@keyframes fm-fallback {
+  to {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {

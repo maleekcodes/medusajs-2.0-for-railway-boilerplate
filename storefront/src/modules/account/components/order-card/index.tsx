@@ -25,20 +25,26 @@ const OrderCard = ({ order }: OrderCardProps) => {
 
   return (
     <div className="bg-white flex flex-col" data-testid="order-card">
-      <div className="uppercase text-large-semi mb-1">
+      <div className="text-xs font-mono uppercase tracking-widest text-deepBlack mb-2">
         #<span data-testid="order-display-id">{order.display_id}</span>
       </div>
-      <div className="flex items-center divide-x divide-gray-200 text-small-regular text-ui-fg-base">
-        <span className="pr-2" data-testid="order-created-at">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small-regular text-neutral-600">
+        <span data-testid="order-created-at">
           {new Date(order.created_at).toDateString()}
         </span>
-        <span className="px-2" data-testid="order-amount">
+        <span className="text-neutral-300" aria-hidden>
+          ·
+        </span>
+        <span data-testid="order-amount">
           {convertToLocale({
             amount: order.total,
             currency_code: order.currency_code,
           })}
         </span>
-        <span className="pl-2">{`${numberOfLines} ${
+        <span className="text-neutral-300" aria-hidden>
+          ·
+        </span>
+        <span>{`${numberOfLines} ${
           numberOfLines > 1 ? "items" : "item"
         }`}</span>
       </div>
@@ -51,9 +57,9 @@ const OrderCard = ({ order }: OrderCardProps) => {
               data-testid="order-item"
             >
               <Thumbnail thumbnail={i.thumbnail} images={[]} size="full" />
-              <div className="flex items-center text-small-regular text-ui-fg-base">
+              <div className="flex items-center text-small-regular text-neutral-600">
                 <span
-                  className="text-ui-fg-base font-semibold"
+                  className="text-deepBlack font-medium"
                   data-testid="item-title"
                 >
                   {i.title}
@@ -75,7 +81,11 @@ const OrderCard = ({ order }: OrderCardProps) => {
       </div>
       <div className="flex justify-end">
         <LocalizedClientLink href={`/account/orders/details/${order.id}`}>
-          <Button data-testid="order-details-link" variant="secondary">
+          <Button
+            data-testid="order-details-link"
+            variant="secondary"
+            className="rounded-none border border-deepBlack font-mono text-xs uppercase tracking-widest text-deepBlack hover:bg-deepBlack hover:text-white"
+          >
             See details
           </Button>
         </LocalizedClientLink>

@@ -7,6 +7,7 @@ import { omit } from "lodash"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import { getAuthHeaders, getCartId, removeCartId, setCartId } from "./cookies"
+import { saveOrderAddressesToCustomer } from "./save-order-addresses"
 import { getProductsById } from "./products"
 import { getRegion } from "./regions"
 
@@ -81,7 +82,10 @@ export async function addToCart({
     throw new Error("Missing variant ID when adding to cart")
   }
 
-  const cart = await getOrSetCart(countryCode)
+  const [cart, authHeaders] = await Promise.all([
+    getOrSetCart(countryCode),
+    getAuthHeaders(),
+  ])
   if (!cart) {
     throw new Error("Error retrieving or creating cart")
   }
@@ -94,7 +98,7 @@ export async function addToCart({
         quantity,
       },
       {},
-      await getAuthHeaders()
+      authHeaders
     )
     .then(() => {
       revalidateTag("cart")
@@ -142,7 +146,6 @@ export async function deleteLineItem(lineId: string) {
       revalidateTag("cart")
     })
     .catch(medusaError)
-  revalidateTag("cart")
 }
 
 export async function enrichLineItems(
@@ -234,11 +237,9 @@ export async function applyPromotions(codes: string[]) {
     throw new Error("No existing cart found")
   }
 
+  // `updateCart` already applies `medusaError` and revalidates; do not chain `.catch(medusaError)` here
+  // or API errors get wrapped twice ("Error setting up the request: …").
   await updateCart({ promo_codes: codes })
-    .then(() => {
-      revalidateTag("cart")
-    })
-    .catch(medusaError)
 }
 
 export async function applyGiftCard(code: string) {
@@ -284,15 +285,44 @@ export async function removeGiftCard(
   //   }
 }
 
+function promotionApplyErrorMessage(raw: string): string {
+  const m = raw.toLowerCase()
+  if (
+    (m.includes("promotion") || m.includes("promo")) &&
+    m.includes("invalid")
+  ) {
+    return "Invalid promo code"
+  }
+  return raw
+}
+
 export async function submitPromotionForm(
-  currentState: unknown,
+  _currentState: unknown,
   formData: FormData
 ) {
-  const code = formData.get("code") as string
+  const raw = formData.get("code")
+  const code = typeof raw === "string" ? raw.trim() : ""
+  if (!code) {
+    return "Enter a promotion code."
+  }
+
   try {
-    await applyPromotions([code])
-  } catch (e: any) {
-    return e.message
+    const cart = await retrieveCart()
+    if (!cart) {
+      return "No cart found."
+    }
+
+    const existingCodes = (cart.promotions ?? [])
+      .filter((p) => !p.is_automatic)
+      .map((p) => p.code)
+      .filter((c): c is string => typeof c === "string" && c.length > 0)
+
+    const codes = [...new Set([...existingCodes, code])]
+    await applyPromotions(codes)
+    return null
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return promotionApplyErrorMessage(msg)
   }
 }
 
@@ -349,11 +379,35 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
   )
 }
 
+/**
+ * Associates the current cart with the logged-in customer (Medusa `transferCart`).
+ * Without this, completed orders stay guest orders: they won't appear under Account → Orders
+ * and checkout addresses won't tie to the customer record.
+ */
+export async function transferCartToSessionCustomer() {
+  const cartId = await getCartId()
+  if (!cartId) {
+    return
+  }
+  const headers = await getAuthHeaders()
+  if (!("authorization" in headers) || !headers.authorization) {
+    return
+  }
+  try {
+    await sdk.store.cart.transferCart(cartId, {}, headers)
+    revalidateTag("cart")
+  } catch {
+    // Already transferred, invalid cart, or race — complete cart will still run
+  }
+}
+
 export async function placeOrder() {
   const cartId = await getCartId()
   if (!cartId) {
     throw new Error("No existing cart found when placing an order")
   }
+
+  await transferCartToSessionCustomer()
 
   const cartRes = await sdk.store.cart
     .complete(cartId, {}, await getAuthHeaders())
@@ -364,6 +418,9 @@ export async function placeOrder() {
     .catch(medusaError)
 
   if (cartRes?.type === "order") {
+    revalidateTag("order")
+    await saveOrderAddressesToCustomer(cartRes.order)
+    revalidateTag("customer")
     const countryCode =
       cartRes.order.shipping_address?.country_code?.toLowerCase()
     await removeCartId()

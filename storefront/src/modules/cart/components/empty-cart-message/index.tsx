@@ -1,23 +1,30 @@
-import { Heading, Text } from "@medusajs/ui"
+import { ShoppingBag } from "lucide-react"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const EmptyCartMessage = () => {
   return (
-    <div className="py-48 px-2 flex flex-col justify-center items-start" data-testid="empty-cart-message">
-      <Heading
-        level="h1"
-        className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
+    <div
+      className="flex flex-col items-center justify-center py-24 text-center md:py-32"
+      data-testid="empty-cart-message"
+    >
+      <ShoppingBag
+        className="mb-8 h-16 w-16 text-neutral-300"
+        strokeWidth={1}
+        aria-hidden
+      />
+      <h1 className="mb-4 text-4xl font-bold tracking-tighter text-deepBlack">
+        Your cart is empty
+      </h1>
+      <p className="mb-8 max-w-md text-neutral-500">
+        Explore our collections and find your next piece.
+      </p>
+      <LocalizedClientLink
+        href="/store"
+        className="inline-block bg-deepBlack px-8 py-3 text-sm font-mono uppercase tracking-widest text-white transition-colors hover:bg-neutral-800"
       >
-        Cart
-      </Heading>
-      <Text className="text-base-regular mt-4 mb-6 max-w-[32rem]">
-        You don&apos;t have anything in your cart. Let&apos;s change that, use
-        the link below to start browsing our products.
-      </Text>
-      <div>
-        <InteractiveLink href="/store">Explore products</InteractiveLink>
-      </div>
+        Shop products
+      </LocalizedClientLink>
     </div>
   )
 }

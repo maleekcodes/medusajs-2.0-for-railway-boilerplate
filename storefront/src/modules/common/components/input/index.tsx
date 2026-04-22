@@ -21,6 +21,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [showPassword, setShowPassword] = useState(false)
     const [inputType, setInputType] = useState(type)
 
+    const hasValueProp = Object.prototype.hasOwnProperty.call(props, "value")
+    const { value, ...restProps } = props
+
     useEffect(() => {
       if (type === "password" && showPassword) {
         setInputType("text")
@@ -45,7 +48,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             placeholder=" "
             required={required}
             className="pt-4 pb-1 block w-full h-11 px-4 mt-0 bg-ui-bg-field border rounded-md appearance-none focus:outline-none focus:ring-0 focus:shadow-borders-interactive-with-active border-ui-border-base hover:bg-ui-bg-field-hover"
-            {...props}
+            {...restProps}
+            {...(hasValueProp ? { value: value ?? "" } : {})}
             ref={inputRef}
           />
           <label

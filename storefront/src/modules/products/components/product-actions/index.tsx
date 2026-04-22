@@ -1,8 +1,9 @@
 "use client"
 
 import { Button } from "@medusajs/ui"
+import dynamic from "next/dynamic"
 import { isEqual } from "lodash"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { useIntersection } from "@lib/hooks/use-in-view"
@@ -11,6 +12,12 @@ import OptionSelect from "@modules/products/components/product-actions/option-se
 
 import MobileActions from "./mobile-actions"
 import ProductPrice from "../product-price"
+
+const PhysicalProductTryOn = dynamic(
+  () =>
+    import("./physical-product-try-on").then((m) => m.PhysicalProductTryOn),
+  { ssr: false }
+)
 import { addToCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 
@@ -18,6 +25,8 @@ type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
+  /** Set from server via env; avoids client-only feature detection that can miss on cold loads. */
+  tryOnEnabled: boolean
 }
 
 const optionsAsKeymap = (variantOptions: any) => {
@@ -33,9 +42,11 @@ export default function ProductActions({
   product,
   region,
   disabled,
+  tryOnEnabled,
 }: ProductActionsProps) {
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  const router = useRouter()
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -105,41 +116,49 @@ export default function ProductActions({
       countryCode,
     })
 
+    router.refresh()
     setIsAdding(false)
   }
 
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
-        <div>
-          {(product.variants?.length ?? 0) > 1 && (
-            <div className="flex flex-col gap-y-4">
-              {(product.options || []).map((option) => {
-                return (
-                  <div key={option.id}>
-                    <OptionSelect
-                      option={option}
-                      current={options[option.title ?? ""]}
-                      updateOption={setOptionValue}
-                      title={option.title ?? ""}
-                      data-testid="product-options"
-                      disabled={!!disabled || isAdding}
-                    />
-                  </div>
-                )
-              })}
-              <Divider />
-            </div>
-          )}
+      <div className="flex flex-col gap-y-6" ref={actionsRef}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <ProductPrice product={product} variant={selectedVariant} />
+          </div>
+          <PhysicalProductTryOn
+            enabled={tryOnEnabled}
+            product={product}
+            countryCode={countryCode}
+          />
         </div>
 
-        <ProductPrice product={product} variant={selectedVariant} />
+        {(product.variants?.length ?? 0) > 1 && (
+          <div className="flex flex-col gap-y-5">
+            {(product.options || []).map((option) => {
+              return (
+                <div key={option.id}>
+                  <OptionSelect
+                    option={option}
+                    current={options[option.title ?? ""]}
+                    updateOption={setOptionValue}
+                    title={option.title ?? ""}
+                    data-testid="product-options"
+                    disabled={!!disabled || isAdding}
+                  />
+                </div>
+              )
+            })}
+            <Divider />
+          </div>
+        )}
 
         <Button
           onClick={handleAddToCart}
           disabled={!inStock || !selectedVariant || !!disabled || isAdding}
           variant="primary"
-          className="w-full h-10"
+          className="h-12 w-full rounded-none border border-deepBlack bg-deepBlack text-xs font-medium uppercase tracking-[0.15em] text-white transition-colors hover:bg-white hover:text-deepBlack disabled:border-neutral-200 disabled:bg-neutral-100 disabled:text-neutral-400 disabled:hover:bg-neutral-100"
           isLoading={isAdding}
           data-testid="add-product-button"
         >
@@ -147,7 +166,7 @@ export default function ProductActions({
             ? "Select variant"
             : !inStock
             ? "Out of stock"
-            : "Add to cart"}
+            : "Add to bag"}
         </Button>
         <MobileActions
           product={product}

@@ -43,12 +43,14 @@ const AccountInfo = ({
 
   return (
     <div className="text-small-regular" data-testid={dataTestid}>
-      <div className="flex items-end justify-between">
-        <div className="flex flex-col">
-          <span className="uppercase text-ui-fg-base">{label}</span>
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex flex-col min-w-0">
+          <span className="text-xs font-mono uppercase tracking-widest text-neutral-400">
+            {label}
+          </span>
           <div className="flex items-center flex-1 basis-0 justify-end gap-x-4">
             {typeof currentInfo === "string" ? (
-              <span className="font-semibold" data-testid="current-info">{currentInfo}</span>
+              <span className="font-medium text-deepBlack" data-testid="current-info">{currentInfo}</span>
             ) : (
               currentInfo
             )}
@@ -57,7 +59,7 @@ const AccountInfo = ({
         <div>
           <Button
             variant="secondary"
-            className="w-[100px] min-h-[25px] py-1"
+            className="w-[100px] min-h-[36px] shrink-0 rounded-none border border-deepBlack py-1.5 font-mono text-xs uppercase tracking-widest text-deepBlack hover:bg-deepBlack hover:text-white"
             onClick={handleToggle}
             type={state ? "reset" : "button"}
             data-testid="edit-button"
@@ -122,7 +124,7 @@ const AccountInfo = ({
             <div className="flex items-center justify-end mt-2">
               <Button
                 isLoading={pending}
-                className="w-full small:max-w-[140px]"
+                className="w-full small:max-w-[180px] rounded-none bg-deepBlack font-mono text-xs uppercase tracking-widest text-white hover:bg-neutral-800"
                 type="submit"
                 data-testid="save-button"
               >

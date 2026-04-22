@@ -15,6 +15,8 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    /** Next.js 16+ requires explicit qualities when using the `quality` prop */
+    qualities: [50, 60, 75],
     remotePatterns: [
       {
         protocol: "http",

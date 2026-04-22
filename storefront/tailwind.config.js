@@ -21,6 +21,8 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        deepBlack: '#0F0F0F',
+        concrete: '#F4F4F4',
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -69,6 +71,7 @@ module.exports = {
           "Ubuntu",
           "sans-serif",
         ],
+        mono: ["JetBrains Mono", "monospace"],
       },
       keyframes: {
         ring: {
@@ -140,6 +143,12 @@ module.exports = {
           "0%": { transform: "translateY(-100%)" },
           "100%": { transform: "translateY(0)" },
         },
+        scan: {
+          "0%": { top: "0%", opacity: "0" },
+          "10%": { opacity: "1" },
+          "90%": { opacity: "1" },
+          "100%": { top: "100%", opacity: "0" },
+        },
       },
       animation: {
         ring: "ring 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
@@ -155,6 +164,7 @@ module.exports = {
         enter: "enter 200ms ease-out",
         "slide-in": "slide-in 1.2s cubic-bezier(.41,.73,.51,1.02)",
         leave: "leave 150ms ease-in forwards",
+        scan: "scan 3s ease-in-out infinite",
       },
     },
   },

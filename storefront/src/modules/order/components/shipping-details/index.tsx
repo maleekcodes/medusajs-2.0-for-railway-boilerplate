@@ -1,73 +1,79 @@
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
-import { Heading, Text } from "@medusajs/ui"
 
-import Divider from "@modules/common/components/divider"
+import { checkoutSectionTitle } from "@modules/checkout/components/checkout-ui"
 
 type ShippingDetailsProps = {
   order: HttpTypes.StoreOrder
 }
 
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {
+  const method = order.shipping_methods?.[0]
+  const shippingTotal = method?.total ?? 0
+
   return (
-    <div>
-      <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
-        Delivery
-      </Heading>
-      <div className="flex items-start gap-x-8">
+    <div className="border-t border-neutral-200 pt-10 md:pt-12">
+      <h2 className={`mb-6 md:mb-8 ${checkoutSectionTitle}`}>Delivery</h2>
+      <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-x-12 sm:gap-y-6">
         <div
-          className="flex flex-col w-1/3"
+          className="min-w-[10rem] flex-1 flex-col"
           data-testid="shipping-address-summary"
         >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">
-            Shipping Address
-          </Text>
-          <Text className="txt-medium text-ui-fg-subtle">
+          <p className="mb-2 text-sm font-bold text-deepBlack">
+            Shipping address
+          </p>
+          <p className="text-sm text-neutral-500">
             {order.shipping_address?.first_name}{" "}
             {order.shipping_address?.last_name}
-          </Text>
-          <Text className="txt-medium text-ui-fg-subtle">
+          </p>
+          <p className="text-sm text-neutral-500">
             {order.shipping_address?.address_1}{" "}
             {order.shipping_address?.address_2}
-          </Text>
-          <Text className="txt-medium text-ui-fg-subtle">
+          </p>
+          <p className="text-sm text-neutral-500">
             {order.shipping_address?.postal_code},{" "}
             {order.shipping_address?.city}
-          </Text>
-          <Text className="txt-medium text-ui-fg-subtle">
+          </p>
+          <p className="text-sm text-neutral-500">
             {order.shipping_address?.country_code?.toUpperCase()}
-          </Text>
+          </p>
         </div>
 
         <div
-          className="flex flex-col w-1/3 "
+          className="min-w-[10rem] flex-1 flex-col"
           data-testid="shipping-contact-summary"
         >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">Contact</Text>
-          <Text className="txt-medium text-ui-fg-subtle">
+          <p className="mb-2 text-sm font-bold text-deepBlack">Contact</p>
+          <p className="text-sm text-neutral-500">
             {order.shipping_address?.phone}
-          </Text>
-          <Text className="txt-medium text-ui-fg-subtle">{order.email}</Text>
+          </p>
+          <p className="text-sm text-neutral-500">{order.email}</p>
         </div>
 
         <div
-          className="flex flex-col w-1/3"
+          className="min-w-[10rem] flex-1 flex-col"
           data-testid="shipping-method-summary"
         >
-          <Text className="txt-medium-plus text-ui-fg-base mb-1">Method</Text>
-          <Text className="txt-medium text-ui-fg-subtle">
-            {(order as any).shipping_methods[0]?.name} (
-            {convertToLocale({
-              amount: order.shipping_methods?.[0].total ?? 0,
-              currency_code: order.currency_code,
-            })
-              .replace(/,/g, "")
-              .replace(/\./g, ",")}
-            )
-          </Text>
+          <p className="mb-2 text-sm font-bold text-deepBlack">Method</p>
+          <p className="text-sm text-neutral-500">
+            {method?.name ? (
+              <>
+                {method.name}{" "}
+                <span className="tabular-nums">
+                  (
+                  {convertToLocale({
+                    amount: shippingTotal,
+                    currency_code: order.currency_code,
+                  })}
+                  )
+                </span>
+              </>
+            ) : (
+              "—"
+            )}
+          </p>
         </div>
       </div>
-      <Divider className="mt-8" />
     </div>
   )
 }

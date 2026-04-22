@@ -10,17 +10,17 @@ type SortProductsProps = {
   "data-testid"?: string
 }
 
-const sortOptions = [
+export const sortOptions = [
   {
-    value: "created_at",
+    value: "created_at" as const,
     label: "Latest Arrivals",
   },
   {
-    value: "price_asc",
+    value: "price_asc" as const,
     label: "Price: Low -> High",
   },
   {
-    value: "price_desc",
+    value: "price_desc" as const,
     label: "Price: High -> Low",
   },
 ]

@@ -79,7 +79,7 @@ export class CartPage extends BasePage {
       productRow,
       title: productRow.getByTestId("product-title"),
       variant: productRow.getByTestId("product-variant"),
-      deleteButton: productRow.getByTestId("delete-button"),
+      deleteButton: productRow.getByTestId("product-delete-button"),
       quantitySelect: productRow.getByTestId("product-select-button"),
       price: productRow.getByTestId("product-unit-price"),
       total: productRow.getByTestId("product-price"),

@@ -2,8 +2,7 @@
 
 import { Plus } from "@medusajs/icons"
 import { Button, Heading } from "@medusajs/ui"
-import { useEffect, useState } from "react"
-import { useFormState } from "react-dom"
+import { useActionState, useEffect, useState } from "react"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
 import CountrySelect from "@modules/checkout/components/country-select"
@@ -17,7 +16,7 @@ const AddAddress = ({ region }: { region: HttpTypes.StoreRegion }) => {
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
 
-  const [formState, formAction] = useFormState(addCustomerAddress, {
+  const [formState, formAction] = useActionState(addCustomerAddress, {
     success: false,
     error: null,
   })
@@ -43,12 +42,15 @@ const AddAddress = ({ region }: { region: HttpTypes.StoreRegion }) => {
   return (
     <>
       <button
-        className="border border-ui-border-base rounded-rounded p-5 min-h-[220px] h-full w-full flex flex-col justify-between"
+        type="button"
+        className="border border-neutral-100 rounded-none p-5 min-h-[220px] h-full w-full flex flex-col justify-between text-left hover:border-deepBlack/40 transition-colors group"
         onClick={open}
         data-testid="add-address-button"
       >
-        <span className="text-base-semi">New address</span>
-        <Plus />
+        <span className="text-xs font-mono uppercase tracking-widest text-deepBlack">
+          New address
+        </span>
+        <Plus className="text-neutral-400 group-hover:text-deepBlack transition-colors" />
       </button>
 
       <Modal isOpen={state} close={close} data-testid="add-address-modal">

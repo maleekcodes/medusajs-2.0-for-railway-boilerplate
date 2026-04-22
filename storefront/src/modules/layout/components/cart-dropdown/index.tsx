@@ -1,11 +1,12 @@
 "use client"
 
 import { Popover, Transition } from "@headlessui/react"
-import { Button } from "@medusajs/ui"
+import { Button, clx } from "@medusajs/ui"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
 
 import { convertToLocale } from "@lib/util/money"
+import { isDigitalRoute } from "@lib/util/is-digital-route"
 import { HttpTypes } from "@medusajs/types"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -60,6 +61,7 @@ const CartDropdown = ({
   }, [activeTimer])
 
   const pathname = usePathname()
+  const digitalNav = isDigitalRoute(pathname)
 
   // open cart dropdown when modifying the cart items, but only if we're not on the cart page
   useEffect(() => {
@@ -78,7 +80,12 @@ const CartDropdown = ({
       <Popover className="relative h-full">
         <Popover.Button className="h-full">
           <LocalizedClientLink
-            className="hover:text-ui-fg-base"
+            className={clx(
+              "whitespace-nowrap",
+              digitalNav
+                ? "text-neutral-300 hover:text-white"
+                : "hover:text-ui-fg-base"
+            )}
             href="/cart"
             data-testid="nav-cart-link"
           >{`Cart (${totalItems})`}</LocalizedClientLink>
