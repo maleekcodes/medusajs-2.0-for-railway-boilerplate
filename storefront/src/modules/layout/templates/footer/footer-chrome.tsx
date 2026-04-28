@@ -52,7 +52,7 @@ export default function FooterChrome() {
               Product
             </h4>
             <ul className={`space-y-2 text-sm ${body}`}>
-              <li>Private Expressions</li>
+              <li>Highest Expression</li>
               <li>Materials: Sustainable fabrics</li>
               <li>Care: Longevity focused</li>
               <li>Archive: 2024 - 2026</li>
@@ -69,7 +69,7 @@ export default function FooterChrome() {
                   href="/content/terms-of-use"
                   className={linkClass}
                 >
-                  Terms &amp; Service
+                  Terms of Service
                 </LocalizedClientLink>
               </li>
               <li>
@@ -78,6 +78,14 @@ export default function FooterChrome() {
                   className={linkClass}
                 >
                   Privacy Policy
+                </LocalizedClientLink>
+              </li>
+              <li>
+                <LocalizedClientLink
+                  href="/content/shipping-policy"
+                  className={linkClass}
+                >
+                  Shipping Policy
                 </LocalizedClientLink>
               </li>
               <li>
