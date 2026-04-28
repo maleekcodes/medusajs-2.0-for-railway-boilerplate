@@ -89,7 +89,7 @@ const Register = ({ countryCode, setCurrentView, returnTo }: Props) => {
             href="/content/terms-of-use"
             className="font-medium text-deepBlack border-b border-deepBlack pb-0.5 hover:opacity-60 transition-opacity"
           >
-            Terms of Use
+            Terms of Service
           </LocalizedClientLink>
           .
         </span>
