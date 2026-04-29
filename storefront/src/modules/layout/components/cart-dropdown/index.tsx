@@ -7,6 +7,7 @@ import { Fragment, useEffect, useRef, useState } from "react"
 
 import { convertToLocale } from "@lib/util/money"
 import { isDigitalRoute } from "@lib/util/is-digital-route"
+import { isOOORoute } from "@lib/util/is-ooo-route"
 import { HttpTypes } from "@medusajs/types"
 import DeleteButton from "@modules/common/components/delete-button"
 import LineItemOptions from "@modules/common/components/line-item-options"
@@ -62,6 +63,8 @@ const CartDropdown = ({
 
   const pathname = usePathname()
   const digitalNav = isDigitalRoute(pathname)
+  const oooNav = isOOORoute(pathname)
+  const darkNav = digitalNav || oooNav
 
   // open cart dropdown when modifying the cart items, but only if we're not on the cart page
   useEffect(() => {
@@ -82,8 +85,10 @@ const CartDropdown = ({
           <LocalizedClientLink
             className={clx(
               "whitespace-nowrap",
-              digitalNav
-                ? "text-neutral-300 hover:text-white"
+              darkNav
+                ? oooNav
+                  ? "text-neutral-400 hover:text-oooText"
+                  : "text-neutral-300 hover:text-white"
                 : "hover:text-ui-fg-base"
             )}
             href="/cart"

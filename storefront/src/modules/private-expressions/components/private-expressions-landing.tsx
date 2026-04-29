@@ -73,12 +73,12 @@ export default function PrivateExpressionsLanding({
   const formUrl = envOverride || text.hubspotFormUrl?.trim() || ""
 
   return (
-    <section className="min-h-[55vh] bg-oooBg text-oooText">
+    <section className="min-h-[55vh] bg-ooo-rise text-oooText antialiased">
       <Container className="flex flex-col items-center py-24 text-center small:py-32">
         {(fetchError || (!content && sanityConfigured)) && (
           <p className="mb-6 max-w-lg text-xs text-amber-200/90" role="status">
             {fetchError
-              ? "Content could not be loaded from CMS. Showing cached fallback copy."
+              ? "Couldn't load from Sanity (check storefront SANITY_PROJECT_ID, SANITY_DATASET, and SANITY_TOKEN — see terminal logs). Showing fallback copy."
               : "Publish the “Private Expressions (OOO)” document in Sanity to edit this page."}
           </p>
         )}
@@ -115,7 +115,7 @@ export default function PrivateExpressionsLanding({
             <iframe
               src={formUrl}
               title="OOO inquiry"
-              className="min-h-[520px] w-full rounded-sm border border-oooBorder bg-oooButton/10"
+              className="min-h-[520px] w-full rounded-sm border border-oooBorder/70 bg-black/25 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.55)]"
             />
           </div>
         ) : (
@@ -124,44 +124,9 @@ export default function PrivateExpressionsLanding({
             NEXT_PUBLIC_PRIVATE_EXPRESSIONS_TYPEFORM_URL in your environment file.
           </p>
         )}
-        <nav
-          aria-label="Legal and policies"
-          className="mt-12 flex max-w-xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.18em] text-oooText/65"
-        >
-          <LocalizedClientLink
-            href="/content/terms-of-use"
-            className="transition-colors hover:text-oooText"
-          >
-            Terms of Service
-          </LocalizedClientLink>
-          <LocalizedClientLink
-            href="/content/privacy-policy"
-            className="transition-colors hover:text-oooText"
-          >
-            Privacy Policy
-          </LocalizedClientLink>
-          <LocalizedClientLink
-            href="/content/shipping-policy"
-            className="transition-colors hover:text-oooText"
-          >
-            Shipping Policy
-          </LocalizedClientLink>
-          <LocalizedClientLink
-            href="/content/privacy-policy#cookies"
-            className="transition-colors hover:text-oooText"
-          >
-            Cookie Settings
-          </LocalizedClientLink>
-        </nav>
-        <a
-          href={`mailto:${text.contactEmail}`}
-          className="mt-4 text-[11px] text-oooText/70 transition-colors hover:text-oooText"
-        >
-          {text.contactEmail}
-        </a>
         <LocalizedClientLink
           href="/"
-          className="mt-10 border-b border-oooBorder pb-0.5 text-xs font-medium uppercase tracking-[0.2em] text-oooText/80 transition-colors hover:border-oooText hover:text-oooText"
+          className="mt-14 border-b border-oooBorder pb-0.5 text-xs font-medium uppercase tracking-[0.2em] text-oooText/80 transition-colors hover:border-oooText hover:text-oooText"
         >
           {text.backToHomeLabel}
         </LocalizedClientLink>

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 
 import { HttpTypes } from "@medusajs/types"
 import { isDigitalRoute } from "@lib/util/is-digital-route"
+import { isOOORoute } from "@lib/util/is-ooo-route"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SideMenu from "@modules/layout/components/side-menu"
 import { Logo } from "@modules/common/components/xyz/Logo"
@@ -22,17 +23,23 @@ export default function NavChrome({
 }: NavChromeProps) {
   const pathname = usePathname()
   const digital = isDigitalRoute(pathname)
+  const ooo = isOOORoute(pathname)
 
-  const link =
-    digital
+  const link = ooo
+    ? "text-neutral-400 hover:text-oooText hover:opacity-90 transition-opacity"
+    : digital
       ? "text-neutral-400 hover:text-white hover:opacity-90 transition-opacity"
       : "text-neutral-500 hover:text-deepBlack hover:opacity-70 transition-opacity"
 
-  const header = digital
-    ? "bg-deepBlack text-white border-neutral-800 border-b"
-    : "bg-white text-deepBlack border-neutral-100 border-b"
+  const header = ooo
+    ? "bg-ooo-rise text-white border-white/[0.08] border-b"
+    : digital
+      ? "bg-deepBlack text-white border-neutral-800 border-b"
+      : "bg-white text-deepBlack border-neutral-100 border-b"
 
-  const logoClass = digital ? "flex items-center text-white" : "flex items-center text-deepBlack"
+  const logoClass = digital || ooo
+    ? "flex items-center text-white"
+    : "flex items-center text-deepBlack"
 
   return (
     <header
@@ -50,7 +57,10 @@ export default function NavChrome({
           </nav>
 
           <div className="md:hidden flex h-full items-center">
-            <SideMenu regions={regions} variant={digital ? "digital" : "light"} />
+            <SideMenu
+              regions={regions}
+              variant={digital ? "digital" : ooo ? "ooo" : "light"}
+            />
           </div>
         </div>
 

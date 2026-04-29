@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import type { SiteFooterSanity } from "@/types/xyz"
 
 import { isDigitalRoute } from "@lib/util/is-digital-route"
+import { isOOORoute } from "@lib/util/is-ooo-route"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Container } from "@modules/common/components/xyz/Container"
 
@@ -152,12 +153,12 @@ function ConnectRow({
 export default function FooterChrome({ siteFooter }: Props) {
   const pathname = usePathname()
   const digital = isDigitalRoute(pathname)
-  const ooo = pathname?.includes("/private-expressions") ?? false
+  const ooo = isOOORoute(pathname)
 
   const f = mergeFooter(siteFooter ?? null)
 
   const shell = ooo
-    ? "bg-oooBg pt-24 pb-12 border-t border-oooBorder transition-colors duration-300"
+    ? "bg-ooo-rise pt-24 pb-12 border-t border-white/[0.08] transition-colors duration-300"
     : digital
       ? "bg-deepBlack pt-24 pb-12 border-t border-neutral-800 transition-colors duration-300"
       : "bg-white pt-24 pb-12 border-t border-neutral-100 transition-colors duration-300"

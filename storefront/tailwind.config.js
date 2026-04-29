@@ -12,6 +12,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        /** Subtle warm lift → deep floor (nav + hero share this) */
+        "ooo-rise":
+          "linear-gradient(165deg, #292520 0%, #1a1715 42%, #13110f 100%)",
+      },
       transitionProperty: {
         width: "width margin",
         height: "height",
@@ -23,11 +28,11 @@ module.exports = {
       colors: {
         deepBlack: '#0F0F0F',
         concrete: '#F4F4F4',
-        /** Highest tier / OOO — brand capsule */
-        oooBg: '#8A7A68',
-        oooText: '#F5F1EB',
-        oooBorder: '#B5A89A',
-        oooButton: '#F5F1EB',
+        /** Highest tier / OOO — warm charcoal capsule (solid anchor = gradient tail) */
+        oooBg: '#13110f',
+        oooText: '#EDE8E0',
+        oooBorder: '#3f3a34',
+        oooButton: '#d9cfc3',
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",

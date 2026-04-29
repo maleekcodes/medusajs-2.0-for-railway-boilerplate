@@ -45,7 +45,7 @@ export function PrivateGate({
   })
 
   return (
-    <section className="relative bg-oooBg py-32 text-oooText">
+    <section className="relative bg-ooo-rise py-32 text-oooText antialiased">
       <Container className="flex flex-col items-center text-center">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}

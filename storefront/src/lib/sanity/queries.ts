@@ -465,24 +465,9 @@ export async function getArFitPage(): Promise<ArFitPageResult> {
 
 // ============ Private expressions (OOO) ============
 
-const privateExpressionsPageQuery = `*[_type == "privateExpressionsPage"][0] {
-  seoTitle,
-  seoDescription,
-  eyebrowLabel,
-  headline,
-  focalLine,
-  narrativeParagraph1,
-  narrativeParagraph2,
-  closingLine,
-  formIntro,
-  hubspotFormUrl,
-  contactEmail,
-  backToHomeLabel,
-  homeTeaserTitle,
-  homeTeaserLine1,
-  homeTeaserLine2,
-  homeTeaserButtonLabel
-}`
+// Full document projections — avoids field mismatches vs Studio drafts / older payloads.
+const privateExpressionsPageQuery = `*[_type == "privateExpressionsPage"][0]`
+
 
 export type PrivateExpressionsPageResult = {
   page: PrivateExpressionsPageSanity | null
@@ -506,27 +491,22 @@ export async function getPrivateExpressionsPage(): Promise<PrivateExpressionsPag
       fetchError: false,
     }
   } catch (e) {
-    console.error("Sanity private expressions page fetch error:", e)
+    const detail =
+      e && typeof e === "object" && "message" in e
+        ? String((e as { message?: string }).message)
+        : String(e)
+    console.error(
+      "Sanity private expressions page fetch error:",
+      detail,
+      e instanceof Error ? e.stack : ""
+    )
     return { page: null, sanityConfigured: true, fetchError: true }
   }
 }
 
 // ============ Site footer ============
 
-const siteFooterQuery = `*[_type == "siteFooter"][0] {
-  brandSectionHeading,
-  brandBodyLines,
-  brandStoryLinkLabel,
-  brandStoryLinkPath,
-  productSectionHeading,
-  productItems[]{ _key, label, internalPath },
-  legalSectionHeading,
-  legalLinks[]{ _key, label, path },
-  connectSectionHeading,
-  connectLinks[]{ _key, label, href },
-  bottomTagline,
-  copyrightName
-}`
+const siteFooterQuery = `*[_type == "siteFooter"][0]`
 
 export type SiteFooterResult = {
   footer: SiteFooterSanity | null
