@@ -33,6 +33,8 @@ module.exports = {
         oooText: '#EDE8E0',
         oooBorder: '#3f3a34',
         oooButton: '#d9cfc3',
+        /** OOO / Private Gate accent — burnt orange strikethrough + eyebrow */
+        oooAccent: '#E95420',
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",

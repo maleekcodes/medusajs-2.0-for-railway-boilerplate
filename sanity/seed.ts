@@ -245,9 +245,9 @@ const privateExpressionsPage = {
   contactEmail: 'contact@wearxyz.co',
   backToHomeLabel: 'Back to home',
   homeTeaserTitle: 'Highest Expression',
-  homeTeaserLine1: 'Our expressions are not publicly offered.',
-  homeTeaserLine2: 'Access is limited and reviewed over time.',
-  homeTeaserButtonLabel: 'Secure Entry',
+  homeTeaserLine1: 'OOO is the highest expression of XYZ London.',
+  homeTeaserLine2: 'Quiet. Personal. Defined.',
+  homeTeaserButtonLabel: 'Proceed',
 }
 
 const siteFooter = {

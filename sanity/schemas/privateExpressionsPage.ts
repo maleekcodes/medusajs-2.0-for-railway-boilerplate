@@ -86,7 +86,7 @@ export default defineType({
       name: 'homeTeaserTitle',
       title: 'Home teaser — headline',
       type: 'string',
-      description: 'Shown in Private Gate on the homepage.',
+      description: 'Large orange headline on the homepage (e.g. “Highest Expression”).',
     }),
     defineField({
       name: 'homeTeaserLine1',
