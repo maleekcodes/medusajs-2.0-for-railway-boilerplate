@@ -14,7 +14,7 @@ interface PrivateGateProps {
 
 export function PrivateGate({ title, paragraph, buttonLabel }: PrivateGateProps) {
   return (
-    <section className="py-32 bg-deepBlack text-white relative">
+    <section className="relative bg-oooBg py-32 text-oooText">
       <Container className="flex flex-col items-center text-center">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -22,11 +22,11 @@ export function PrivateGate({ title, paragraph, buttonLabel }: PrivateGateProps)
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Lock className="w-12 h-12 mb-8 mx-auto stroke-1 text-neutral-500" />
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-6">
-            {title || "Private Expressions"}
+          <Lock className="mx-auto mb-8 h-12 w-12 stroke-1 text-oooText/55" />
+          <h2 className="mb-6 text-3xl font-bold tracking-tighter md:text-5xl">
+            {title || "Highest Expression"}
           </h2>
-          <div className="space-y-2 text-neutral-400 font-light mb-10">
+          <div className="mb-10 space-y-2 font-light text-oooText/85">
             {paragraph ? (
               <p>{paragraph}</p>
             ) : (
@@ -39,7 +39,7 @@ export function PrivateGate({ title, paragraph, buttonLabel }: PrivateGateProps)
 
           <LocalizedClientLink
             href="/private-expressions"
-            className="inline-block bg-white text-deepBlack px-10 py-4 text-xs uppercase tracking-[0.2em] font-medium hover:bg-neutral-200 transition-colors"
+            className="inline-block bg-oooButton px-10 py-4 text-xs font-medium uppercase tracking-[0.2em] text-oooBg transition-opacity hover:opacity-90"
           >
             {buttonLabel || "Secure Entry"}
           </LocalizedClientLink>

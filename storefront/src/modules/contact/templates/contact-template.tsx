@@ -53,10 +53,10 @@ export default function ContactTemplate() {
               Email
             </h2>
             <a
-              href="mailto:contact@xyzwear.com"
+              href="mailto:contact@wearxyz.co"
               className="text-xl font-semibold text-deepBlack underline decoration-neutral-300 underline-offset-[6px] transition-colors hover:decoration-deepBlack md:text-2xl"
             >
-              contact@xyzwear.com
+              contact@wearxyz.co
             </a>
           </motion.div>
 

@@ -23,6 +23,11 @@ module.exports = {
       colors: {
         deepBlack: '#0F0F0F',
         concrete: '#F4F4F4',
+        /** Highest tier / OOO — brand capsule */
+        oooBg: '#8A7A68',
+        oooText: '#F5F1EB',
+        oooBorder: '#B5A89A',
+        oooButton: '#F5F1EB',
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",

@@ -15,41 +15,79 @@ export default function PrivateExpressionsLanding() {
   const formUrl = oooFormEmbedUrl()
 
   return (
-    <section className="bg-deepBlack text-white min-h-[55vh]">
-      <Container className="py-24 small:py-32 flex flex-col items-center text-center">
-        <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-8">
+    <section className="min-h-[55vh] bg-oooBg text-oooText">
+      <Container className="flex flex-col items-center py-24 text-center small:py-32">
+        <p className="mb-8 text-xs font-bold uppercase tracking-widest text-oooText/70">
           OOO
         </p>
-        <div className="max-w-xl space-y-6 mb-14">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tighter leading-snug">
+        <div className="mb-14 max-w-xl space-y-6">
+          <h1 className="text-2xl font-bold tracking-tighter leading-snug md:text-3xl lg:text-4xl">
             OOO is the highest expression of XYZ London.
           </h1>
-          <p className="text-xl md:text-2xl font-semibold tracking-tight text-white">
+          <p className="text-xl font-semibold tracking-tight text-oooText md:text-2xl">
             The Few.
           </p>
-          <p className="text-neutral-300 font-light leading-relaxed">
+          <p className="font-light leading-relaxed text-oooText/90">
             OOO exists beyond season and trend. Each piece is formed with deliberate
-            craftsmanship—guided by precision, restraint, and uncompromising
-            standards, released in rare quantity.
+            craftsmanship—guided by precision, restraint, and uncompromising standards,
+            released in rare quantity.
           </p>
-          <p className="text-neutral-300 font-light leading-relaxed">
-            Reserved for those who recognise intention and value substance without
-            the need for acknowledgement.
+          <p className="font-light leading-relaxed text-oooText/90">
+            Reserved for those who recognise intention and value substance without the need for
+            acknowledgement.
           </p>
-          <p className="text-sm uppercase tracking-[0.2em] text-neutral-400">
+          <p className="text-sm uppercase tracking-[0.2em] text-oooText/75">
             Quiet. Personal. Defined.
           </p>
         </div>
+        <p className="mb-4 w-full max-w-lg text-center text-sm font-medium text-oooText/85">
+          Complete the form to express interest
+        </p>
         <div className="w-full max-w-lg">
           <iframe
             src={formUrl}
             title="OOO inquiry"
-            className="w-full min-h-[520px] rounded-sm border border-neutral-800 bg-deepBlack"
+            className="min-h-[520px] w-full rounded-sm border border-oooBorder bg-oooButton/10"
           />
         </div>
+        <nav
+          aria-label="Legal and policies"
+          className="mt-12 flex max-w-xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] uppercase tracking-[0.18em] text-oooText/65"
+        >
+          <LocalizedClientLink
+            href="/content/terms-of-use"
+            className="transition-colors hover:text-oooText"
+          >
+            Terms of Service
+          </LocalizedClientLink>
+          <LocalizedClientLink
+            href="/content/privacy-policy"
+            className="transition-colors hover:text-oooText"
+          >
+            Privacy Policy
+          </LocalizedClientLink>
+          <LocalizedClientLink
+            href="/content/shipping-policy"
+            className="transition-colors hover:text-oooText"
+          >
+            Shipping Policy
+          </LocalizedClientLink>
+          <LocalizedClientLink
+            href="/content/privacy-policy#cookies"
+            className="transition-colors hover:text-oooText"
+          >
+            Cookie Settings
+          </LocalizedClientLink>
+        </nav>
+        <a
+          href="mailto:contact@wearxyz.co"
+          className="mt-4 text-[11px] text-oooText/70 transition-colors hover:text-oooText"
+        >
+          contact@wearxyz.co
+        </a>
         <LocalizedClientLink
           href="/"
-          className="mt-14 text-xs uppercase tracking-[0.2em] font-medium text-neutral-500 border-b border-neutral-600 pb-0.5 hover:text-white hover:border-white transition-colors"
+          className="mt-10 border-b border-oooBorder pb-0.5 text-xs font-medium uppercase tracking-[0.2em] text-oooText/80 transition-colors hover:border-oooText hover:text-oooText"
         >
           Back to home
         </LocalizedClientLink>
