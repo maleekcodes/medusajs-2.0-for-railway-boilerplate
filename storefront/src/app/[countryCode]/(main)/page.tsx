@@ -10,7 +10,10 @@ import { VirtualTryOnSection } from "@modules/home/components/xyz/VirtualTryOnSe
 import { PrivateGate } from "@modules/home/components/xyz/PrivateGate"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
-import { getHomePage } from "@lib/sanity/queries"
+import {
+  getHomePage,
+  getPrivateExpressionsPage,
+} from "@lib/sanity/queries"
 
 export const metadata: Metadata = {
   title: SITE_TITLE_DEFAULT,
@@ -28,10 +31,11 @@ export default async function Home({
 }) {
   const { countryCode } = await params
 
-  const [collections, region, homePageResult] = await Promise.all([
+  const [collections, region, homePageResult, peeResult] = await Promise.all([
     getCollectionsWithProducts(countryCode),
     getRegion(countryCode),
     getHomePage(),
+    getPrivateExpressionsPage(),
   ])
 
   if (!collections || !region) {
@@ -39,6 +43,7 @@ export default async function Home({
   }
 
   const page = homePageResult.page
+  const pee = peeResult.page
 
   const collectionsWithProducts = collections
     .filter((c) => Array.isArray(c.products) && c.products.length > 0)
@@ -102,9 +107,10 @@ export default async function Home({
       </div>
       <div id="private">
         <PrivateGate
-          title={page?.privateGateTitle ?? undefined}
-          paragraph={page?.privateGateParagraph ?? undefined}
-          buttonLabel={page?.privateGateButtonLabel ?? undefined}
+          title={pee?.homeTeaserTitle ?? undefined}
+          teaserLine1={pee?.homeTeaserLine1 ?? undefined}
+          teaserLine2={pee?.homeTeaserLine2 ?? undefined}
+          buttonLabel={pee?.homeTeaserButtonLabel ?? undefined}
         />
       </div>
     </>

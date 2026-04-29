@@ -124,12 +124,60 @@ export type HomePageSanity = {
   arFitTitle?: string | null
   arFitParagraph?: string | null
   arFitCtaLabel?: string | null
-  // Private gate
-  privateGateLabel?: string | null
-  privateGateTitle?: string | null
-  privateGateParagraph?: string | null
-  privateGateInputPlaceholder?: string | null
-  privateGateButtonLabel?: string | null
+}
+
+/** Singleton: `/private-expressions` + home PrivateGate teaser — source of truth in Studio */
+export type PrivateExpressionsPageSanity = {
+  seoTitle?: string | null
+  seoDescription?: string | null
+  eyebrowLabel?: string | null
+  headline?: string | null
+  focalLine?: string | null
+  narrativeParagraph1?: string | null
+  narrativeParagraph2?: string | null
+  closingLine?: string | null
+  formIntro?: string | null
+  hubspotFormUrl?: string | null
+  contactEmail?: string | null
+  backToHomeLabel?: string | null
+  homeTeaserTitle?: string | null
+  homeTeaserLine1?: string | null
+  homeTeaserLine2?: string | null
+  homeTeaserButtonLabel?: string | null
+}
+
+export type SiteFooterProductItem = {
+  _key?: string
+  label?: string | null
+  internalPath?: string | null
+}
+
+export type SiteFooterLegalLink = {
+  _key?: string
+  label?: string | null
+  path?: string | null
+}
+
+export type SiteFooterConnectLink = {
+  _key?: string
+  label?: string | null
+  href?: string | null
+}
+
+/** Singleton — global footer chrome */
+export type SiteFooterSanity = {
+  brandSectionHeading?: string | null
+  brandBodyLines?: string[] | null
+  brandStoryLinkLabel?: string | null
+  brandStoryLinkPath?: string | null
+  productSectionHeading?: string | null
+  productItems?: SiteFooterProductItem[] | null
+  legalSectionHeading?: string | null
+  legalLinks?: SiteFooterLegalLink[] | null
+  connectSectionHeading?: string | null
+  connectLinks?: SiteFooterConnectLink[] | null
+  bottomTagline?: string | null
+  copyrightName?: string | null
 }
 
 /** About page body paragraph item */

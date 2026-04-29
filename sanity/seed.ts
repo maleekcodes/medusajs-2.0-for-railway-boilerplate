@@ -224,13 +224,69 @@ const homePage = {
   arFitParagraph:
     'Try-on helps you decide with more context: upload a photo on eligible physical or digital product pages and we composite the piece onto you. A clearer starting point online than catalog shots alone.',
   arFitCtaLabel: 'How it works',
-  // Private Gate - v1 dark style
-  privateGateTitle: 'Private Expressions',
-  privateGateParagraph: 'Our expressions are not publicly offered. Access is limited and reviewed over time.',
-  privateGateButtonLabel: 'Secure Entry',
 }
 
-// About Page - migrated from About.tsx (v1 full content)
+const privateExpressionsPage = {
+  _id: 'privateExpressionsPage',
+  _type: 'privateExpressionsPage',
+  seoTitle: 'OOO — Highest Expression | XYZ London',
+  seoDescription:
+    'OOO is the highest expression of XYZ London. Beyond season and trend—reserved for those who recognise intention.',
+  eyebrowLabel: 'OOO',
+  headline: 'OOO is the highest expression of XYZ London.',
+  focalLine: 'The Few.',
+  narrativeParagraph1:
+    'OOO exists beyond season and trend. Each piece is formed with deliberate craftsmanship—guided by precision, restraint, and uncompromising standards, released in rare quantity.',
+  narrativeParagraph2:
+    'Reserved for those who recognise intention and value substance without the need for acknowledgement.',
+  closingLine: 'Quiet. Personal. Defined.',
+  formIntro: 'Complete the form to express interest',
+  hubspotFormUrl: 'https://2fu564.share-eu1.hsforms.com/2QJmK62N_R1miIbA3scmoaw',
+  contactEmail: 'contact@wearxyz.co',
+  backToHomeLabel: 'Back to home',
+  homeTeaserTitle: 'Highest Expression',
+  homeTeaserLine1: 'Our expressions are not publicly offered.',
+  homeTeaserLine2: 'Access is limited and reviewed over time.',
+  homeTeaserButtonLabel: 'Secure Entry',
+}
+
+const siteFooter = {
+  _id: 'siteFooter',
+  _type: 'siteFooter',
+  brandSectionHeading: 'Brand Philosophy',
+  brandBodyLines: [
+    'XYZ London exists to uncover identity through form.',
+    'We believe in expression through movement, proportion, and restraint.',
+    'Our garments are designed for longevity, not trends.',
+    'Our digital expressions explore identity beyond physical constraints.',
+  ],
+  brandStoryLinkLabel: 'Read Our Story',
+  brandStoryLinkPath: '/about',
+  productSectionHeading: 'Product',
+  productItems: [
+    { _key: 'p1', label: 'Highest Expression', internalPath: '/private-expressions' },
+    { _key: 'p2', label: 'Materials: Sustainable fabrics' },
+    { _key: 'p3', label: 'Care: Longevity focused' },
+    { _key: 'p4', label: 'Archive: 2024 - 2026' },
+  ],
+  legalSectionHeading: 'Legal',
+  legalLinks: [
+    { _key: 'l1', label: 'Terms of Service', path: '/content/terms-of-use' },
+    { _key: 'l2', label: 'Privacy Policy', path: '/content/privacy-policy' },
+    { _key: 'l3', label: 'Shipping Policy', path: '/content/shipping-policy' },
+    { _key: 'l4', label: 'Cookie Settings', path: '/content/privacy-policy#cookies' },
+  ],
+  connectSectionHeading: 'Connect',
+  connectLinks: [
+    { _key: 'c1', label: 'Contact', href: '/contact' },
+    { _key: 'c2', label: 'Instagram', href: 'https://instagram.com' },
+    { _key: 'c3', label: 'Twitter / X', href: 'https://x.com' },
+    { _key: 'c4', label: 'contact@wearxyz.co', href: 'mailto:contact@wearxyz.co' },
+  ],
+  bottomTagline: 'Physical / Digital',
+  copyrightName: 'XYZ London',
+}
+
 const aboutPage = {
   _id: 'aboutPage',
   _type: 'aboutPage',
@@ -460,6 +516,28 @@ async function seedDigitalFormPage() {
   }
 }
 
+async function seedPrivateExpressionsPage() {
+  console.log('\n--- Seeding Private Expressions (OOO) ---')
+
+  try {
+    await client.createOrReplace(privateExpressionsPage)
+    console.log(`  [OK] Private Expressions`)
+  } catch (error) {
+    console.error(`  [FAIL] Private Expressions:`, error)
+  }
+}
+
+async function seedSiteFooterDoc() {
+  console.log('\n--- Seeding Site footer ---')
+
+  try {
+    await client.createOrReplace(siteFooter)
+    console.log(`  [OK] Site footer`)
+  } catch (error) {
+    console.error(`  [FAIL] Site footer:`, error)
+  }
+}
+
 // ============================================================================
 // MAIN
 // ============================================================================
@@ -480,10 +558,12 @@ async function main() {
   await seedAboutPage()
   await seedArFitPage()
   await seedDigitalFormPage()
+  await seedPrivateExpressionsPage()
+  await seedSiteFooterDoc()
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(2)
 
-  const totalDocuments = journalPosts.length + 5
+  const totalDocuments = journalPosts.length + 7
 
   console.log('\n' + '='.repeat(60))
   console.log('SEED COMPLETE')
@@ -495,6 +575,8 @@ async function main() {
   console.log(`  - About Page: 1`)
   console.log(`  - Try-on page: 1`)
   console.log(`  - Digital Form Page: 1`)
+  console.log(`  - Private Expressions (OOO): 1`)
+  console.log(`  - Site footer: 1`)
   console.log(`\nTotal documents: ${totalDocuments}`)
   console.log(`Time: ${elapsed}s`)
   console.log('\nNext steps:')

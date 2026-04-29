@@ -136,47 +136,12 @@ export default defineType({
       type: 'text',
       rows: 4,
     }),
-    defineField({
-      name: 'arFitCtaLabel',
-      title: 'Try-on — CTA label',
-      type: 'string',
-      description: 'e.g., "How it works"',
-    }),
-
-    // Private Gate Section
-    defineField({
-      name: 'privateGateLabel',
-      title: 'Private Gate Label',
-      type: 'string',
-      description: 'e.g., "Exclusive Access"',
-    }),
-    defineField({
-      name: 'privateGateTitle',
-      title: 'Private Gate Title',
-      type: 'string',
-    }),
-    defineField({
-      name: 'privateGateParagraph',
-      title: 'Private Gate Paragraph',
-      type: 'text',
-      rows: 4,
-    }),
-    defineField({
-      name: 'privateGateInputPlaceholder',
-      title: 'Email Input Placeholder',
-      type: 'string',
-    }),
-    defineField({
-      name: 'privateGateButtonLabel',
-      title: 'Submit Button Label',
-      type: 'string',
-    }),
   ],
   preview: {
     prepare() {
       return {
         title: 'Home Page',
-        subtitle: 'Hero, Introduction, Philosophy, Try-on, Private Gate',
+        subtitle: 'Hero, Introduction, Philosophy, Try-on — OOO teaser is in Private expressions',
       }
     },
   },

@@ -7,6 +7,8 @@ import type {
   HomePageSanity,
   AboutPageSanity,
   ArFitPageSanity,
+  PrivateExpressionsPageSanity,
+  SiteFooterSanity,
 } from "@/types/xyz"
 
 import {
@@ -336,12 +338,7 @@ const homePageQuery = `*[_type == "homePage"][0] {
   arFitLabel,
   arFitTitle,
   arFitParagraph,
-  arFitCtaLabel,
-  privateGateLabel,
-  privateGateTitle,
-  privateGateParagraph,
-  privateGateInputPlaceholder,
-  privateGateButtonLabel
+  arFitCtaLabel
 }`
 
 export type HomePageResult = {
@@ -463,5 +460,95 @@ export async function getArFitPage(): Promise<ArFitPageResult> {
   } catch (e) {
     console.error("Sanity AR fit page fetch error:", e)
     return { page: null, sanityConfigured: true, fetchError: true }
+  }
+}
+
+// ============ Private expressions (OOO) ============
+
+const privateExpressionsPageQuery = `*[_type == "privateExpressionsPage"][0] {
+  seoTitle,
+  seoDescription,
+  eyebrowLabel,
+  headline,
+  focalLine,
+  narrativeParagraph1,
+  narrativeParagraph2,
+  closingLine,
+  formIntro,
+  hubspotFormUrl,
+  contactEmail,
+  backToHomeLabel,
+  homeTeaserTitle,
+  homeTeaserLine1,
+  homeTeaserLine2,
+  homeTeaserButtonLabel
+}`
+
+export type PrivateExpressionsPageResult = {
+  page: PrivateExpressionsPageSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export async function getPrivateExpressionsPage(): Promise<PrivateExpressionsPageResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { page: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const page = await client.fetch<PrivateExpressionsPageSanity | null>(
+      privateExpressionsPageQuery
+    )
+    return {
+      page: page ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity private expressions page fetch error:", e)
+    return { page: null, sanityConfigured: true, fetchError: true }
+  }
+}
+
+// ============ Site footer ============
+
+const siteFooterQuery = `*[_type == "siteFooter"][0] {
+  brandSectionHeading,
+  brandBodyLines,
+  brandStoryLinkLabel,
+  brandStoryLinkPath,
+  productSectionHeading,
+  productItems[]{ _key, label, internalPath },
+  legalSectionHeading,
+  legalLinks[]{ _key, label, path },
+  connectSectionHeading,
+  connectLinks[]{ _key, label, href },
+  bottomTagline,
+  copyrightName
+}`
+
+export type SiteFooterResult = {
+  footer: SiteFooterSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export async function getSiteFooter(): Promise<SiteFooterResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { footer: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const footer = await client.fetch<SiteFooterSanity | null>(siteFooterQuery)
+    return {
+      footer: footer ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity site footer fetch error:", e)
+    return { footer: null, sanityConfigured: true, fetchError: true }
   }
 }

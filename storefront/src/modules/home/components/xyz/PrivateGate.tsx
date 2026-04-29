@@ -8,11 +8,42 @@ import { Container } from "@modules/common/components/xyz/Container"
 
 interface PrivateGateProps {
   title?: string
+  teaserLine1?: string
+  teaserLine2?: string
+  /** Fallback when teaser lines omitted (supports two paragraphs separated by blank line). */
   paragraph?: string
   buttonLabel?: string
 }
 
-export function PrivateGate({ title, paragraph, buttonLabel }: PrivateGateProps) {
+const DEFAULT_LINES = ["Our expressions are not publicly offered.", "Access is limited and reviewed over time."]
+
+function resolveLines(props: PrivateGateProps): string[] {
+  const a = props.teaserLine1?.trim()
+  const b = props.teaserLine2?.trim()
+  if (a || b) {
+    return [a, b].filter((x): x is string => Boolean(x?.length))
+  }
+  const p = props.paragraph?.trim()
+  if (p) {
+    const chunks = p.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean)
+    return chunks.length > 0 ? chunks : [p]
+  }
+  return DEFAULT_LINES
+}
+
+export function PrivateGate({
+  title,
+  teaserLine1,
+  teaserLine2,
+  paragraph,
+  buttonLabel,
+}: PrivateGateProps) {
+  const lines = resolveLines({
+    teaserLine1,
+    teaserLine2,
+    paragraph,
+  })
+
   return (
     <section className="relative bg-oooBg py-32 text-oooText">
       <Container className="flex flex-col items-center text-center">
@@ -27,14 +58,9 @@ export function PrivateGate({ title, paragraph, buttonLabel }: PrivateGateProps)
             {title || "Highest Expression"}
           </h2>
           <div className="mb-10 space-y-2 font-light text-oooText/85">
-            {paragraph ? (
-              <p>{paragraph}</p>
-            ) : (
-              <>
-                <p>Our expressions are not publicly offered.</p>
-                <p>Access is limited and reviewed over time.</p>
-              </>
-            )}
+            {lines.map((line, idx) => (
+              <p key={idx}>{line}</p>
+            ))}
           </div>
 
           <LocalizedClientLink

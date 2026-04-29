@@ -2,14 +2,159 @@
 
 import { usePathname } from "next/navigation"
 
+import type { SiteFooterSanity } from "@/types/xyz"
+
 import { isDigitalRoute } from "@lib/util/is-digital-route"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Container } from "@modules/common/components/xyz/Container"
 
-export default function FooterChrome() {
+/** Matches storefront defaults before Sanity was wired (used when CMS row missing). */
+const DEFAULT_FOOTER = {
+  brandSectionHeading: "Brand Philosophy",
+  brandBodyLines: [
+    "XYZ London exists to uncover identity through form.",
+    "We believe in expression through movement, proportion, and restraint.",
+    "Our garments are designed for longevity, not trends.",
+    "Our digital expressions explore identity beyond physical constraints.",
+  ],
+  brandStoryLinkLabel: "Read Our Story",
+  brandStoryLinkPath: "/about",
+  productSectionHeading: "Product",
+  productItems: [
+    {
+      label: "Highest Expression",
+      internalPath: "/private-expressions",
+    },
+    {
+      label: "Materials: Sustainable fabrics",
+    },
+    {
+      label: "Care: Longevity focused",
+    },
+    {
+      label: "Archive: 2024 - 2026",
+    },
+  ],
+  legalSectionHeading: "Legal",
+  legalLinks: [
+    { label: "Terms of Service", path: "/content/terms-of-use" },
+    { label: "Privacy Policy", path: "/content/privacy-policy" },
+    { label: "Shipping Policy", path: "/content/shipping-policy" },
+    {
+      label: "Cookie Settings",
+      path: "/content/privacy-policy#cookies",
+    },
+  ],
+  connectSectionHeading: "Connect",
+  connectLinks: [
+    { label: "Contact", href: "/contact" },
+    {
+      label: "Instagram",
+      href: "https://instagram.com",
+    },
+    { label: "Twitter / X", href: "https://x.com" },
+    { label: "contact@wearxyz.co", href: "mailto:contact@wearxyz.co" },
+  ],
+  bottomTagline: "Physical / Digital",
+  copyrightName: "XYZ London",
+} satisfies SiteFooterSanity
+
+function mergeFooter(site?: SiteFooterSanity | null): SiteFooterSanity {
+  const d = DEFAULT_FOOTER
+  const hasLines =
+    site?.brandBodyLines?.some((l) => typeof l === "string" && l.trim().length > 0) ??
+    false
+  const lines = hasLines
+    ? (site!.brandBodyLines ?? []).filter(
+        (l): l is string => typeof l === "string" && l.trim().length > 0
+      )
+    : (d.brandBodyLines ?? [])
+
+  const productItems =
+    site?.productItems && site.productItems.length > 0
+      ? site.productItems
+      : (d.productItems ?? [])
+
+  const legalLinks =
+    site?.legalLinks && site.legalLinks.length > 0
+      ? site.legalLinks
+      : (d.legalLinks ?? [])
+
+  const connectLinks =
+    site?.connectLinks && site.connectLinks.length > 0
+      ? site.connectLinks
+      : (d.connectLinks ?? [])
+
+  return {
+    brandSectionHeading:
+      site?.brandSectionHeading?.trim() ?? d.brandSectionHeading ?? undefined,
+    brandBodyLines: lines,
+    brandStoryLinkLabel:
+      site?.brandStoryLinkLabel?.trim() ?? d.brandStoryLinkLabel ?? undefined,
+    brandStoryLinkPath:
+      site?.brandStoryLinkPath?.trim() ?? d.brandStoryLinkPath ?? undefined,
+    productSectionHeading:
+      site?.productSectionHeading?.trim() ??
+      d.productSectionHeading ??
+      undefined,
+    productItems,
+    legalSectionHeading:
+      site?.legalSectionHeading?.trim() ?? d.legalSectionHeading ?? undefined,
+    legalLinks,
+    connectSectionHeading:
+      site?.connectSectionHeading?.trim() ??
+      d.connectSectionHeading ??
+      undefined,
+    connectLinks,
+    bottomTagline: site?.bottomTagline?.trim() ?? d.bottomTagline ?? undefined,
+    copyrightName: site?.copyrightName?.trim() ?? d.copyrightName ?? undefined,
+  }
+}
+
+type Props = {
+  siteFooter?: SiteFooterSanity | null
+}
+
+function ConnectRow({
+  label,
+  href,
+  linkClass,
+}: {
+  label: string
+  href: string
+  linkClass: string
+}) {
+  const isExternal =
+    href.startsWith("http://") ||
+    href.startsWith("https://") ||
+    href.startsWith("mailto:")
+  if (isExternal) {
+    const isBlank = href.startsWith("http")
+    return (
+      <a
+        href={href}
+        className={linkClass}
+        {...(isBlank
+          ? ({ target: "_blank", rel: "noopener noreferrer" } as const)
+          : {})}
+      >
+        {label}
+      </a>
+    )
+  }
+  return (
+    <LocalizedClientLink href={href} className={linkClass}>
+      {label}
+    </LocalizedClientLink>
+  )
+}
+
+export default function FooterChrome({ siteFooter }: Props) {
   const pathname = usePathname()
   const digital = isDigitalRoute(pathname)
   const ooo = pathname?.includes("/private-expressions") ?? false
+
+  const f = mergeFooter(siteFooter ?? null)
 
   const shell = ooo
     ? "bg-oooBg pt-24 pb-12 border-t border-oooBorder transition-colors duration-300"
@@ -25,8 +170,8 @@ export default function FooterChrome() {
       ? "text-sm font-medium text-white border-b border-white pb-0.5 hover:opacity-60 transition-opacity inline-block"
       : "text-sm font-medium text-deepBlack border-b border-deepBlack pb-0.5 hover:opacity-60 transition-opacity inline-block"
   const bottomBorder = ooo ? "border-oooBorder" : digital ? "border-neutral-800" : "border-neutral-100"
-  const copyright = ooo ? "text-oooText/65" : digital ? "text-neutral-500" : "text-neutral-400"
-  const tagline = ooo ? "text-oooText/55" : digital ? "text-neutral-500" : "text-neutral-300"
+  const copyrightClass = ooo ? "text-oooText/65" : digital ? "text-neutral-500" : "text-neutral-400"
+  const taglineClass = ooo ? "text-oooText/55" : digital ? "text-neutral-500" : "text-neutral-300"
 
   const linkClass = ooo
     ? "text-oooText/90 hover:opacity-80 transition-opacity"
@@ -35,135 +180,99 @@ export default function FooterChrome() {
   return (
     <footer className={shell}>
       <Container>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-12 mb-24">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-x-8 lg:gap-y-12 mb-24">
           <div className="space-y-4 sm:col-span-2 lg:col-span-5">
             <h4 className={`text-xs font-bold uppercase tracking-widest ${heading}`}>
-              Brand Philosophy
+              {f.brandSectionHeading}
             </h4>
-            <p className={`text-sm ${body} leading-relaxed`}>
-              XYZ London exists to uncover identity through form.
-              <br />
-              We believe in expression through movement, proportion, and restraint.
-              <br />
-              Our garments are designed for longevity, not trends.
-              <br />
-              Our digital expressions explore identity beyond physical constraints.
+            <p className={`text-sm leading-relaxed ${body}`}>
+              {f.brandBodyLines?.map((line, i) => (
+                <span key={i}>
+                  {i > 0 ? <br /> : null}
+                  {line}
+                </span>
+              ))}
             </p>
-            <LocalizedClientLink href="/about" className={storyLink}>
-              Read Our Story
-            </LocalizedClientLink>
+            {f.brandStoryLinkPath && f.brandStoryLinkLabel ? (
+              <LocalizedClientLink href={f.brandStoryLinkPath} className={storyLink}>
+                {f.brandStoryLinkLabel}
+              </LocalizedClientLink>
+            ) : null}
           </div>
 
           <div className="space-y-4 lg:col-span-2">
             <h4 className={`text-xs font-bold uppercase tracking-widest ${heading}`}>
-              Product
+              {f.productSectionHeading}
             </h4>
             <ul className={`space-y-2 text-sm ${body}`}>
-              <li>
-                <LocalizedClientLink
-                  href="/private-expressions"
-                  className={`${linkClass} ${body}`}
-                >
-                  Highest Expression
-                </LocalizedClientLink>
-              </li>
-              <li>Materials: Sustainable fabrics</li>
-              <li>Care: Longevity focused</li>
-              <li>Archive: 2024 - 2026</li>
+              {f.productItems?.map((item, idx) => (
+                <li key={item._key ?? `p-${idx}`}>
+                  {item.internalPath?.trim() ? (
+                    <LocalizedClientLink
+                      href={item.internalPath.trim()}
+                      className={`${linkClass} ${body}`}
+                    >
+                      {item.label}
+                    </LocalizedClientLink>
+                  ) : (
+                    <span>{item.label}</span>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="space-y-4 lg:col-span-2">
             <h4 className={`text-xs font-bold uppercase tracking-widest ${heading}`}>
-              Legal
+              {f.legalSectionHeading}
             </h4>
             <ul className={`space-y-2 text-sm ${body}`}>
-              <li>
-                <LocalizedClientLink
-                  href="/content/terms-of-use"
-                  className={linkClass}
-                >
-                  Terms of Service
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/content/privacy-policy"
-                  className={linkClass}
-                >
-                  Privacy Policy
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/content/shipping-policy"
-                  className={linkClass}
-                >
-                  Shipping Policy
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/content/privacy-policy#cookies"
-                  className={linkClass}
-                >
-                  Cookie Settings
-                </LocalizedClientLink>
-              </li>
+              {f.legalLinks?.map((item, idx) => (
+                <li key={item._key ?? `l-${idx}`}>
+                  {item.path?.trim() ? (
+                    <LocalizedClientLink href={item.path.trim()} className={linkClass}>
+                      {item.label}
+                    </LocalizedClientLink>
+                  ) : (
+                    <span>{item.label}</span>
+                  )}
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="space-y-4 lg:col-span-3">
             <h4 className={`text-xs font-bold uppercase tracking-widest ${heading}`}>
-              Connect
+              {f.connectSectionHeading}
             </h4>
             <ul className={`space-y-2 text-sm ${body}`}>
-              <li>
-                <LocalizedClientLink href="/contact" className={linkClass}>
-                  Contact
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={linkClass}
-                >
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://x.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={linkClass}
-                >
-                  Twitter / X
-                </a>
-              </li>
-              <li>
-                <a href="mailto:contact@wearxyz.co" className={linkClass}>
-                  contact@wearxyz.co
-                </a>
-              </li>
+              {f.connectLinks?.map((item, idx) =>
+                item.href?.trim() && item.label?.trim() ? (
+                  <li key={item._key ?? `c-${idx}`}>
+                    <ConnectRow
+                      label={item.label.trim()}
+                      href={item.href.trim()}
+                      linkClass={linkClass}
+                    />
+                  </li>
+                ) : null
+              )}
             </ul>
           </div>
         </div>
 
         <div
-          className={`flex flex-col md:flex-row justify-between items-center pt-8 border-t ${bottomBorder}`}
+          className={`flex flex-col items-center justify-between border-t pt-8 md:flex-row ${bottomBorder}`}
         >
           <span
-            className={`text-[10px] md:text-xs uppercase tracking-widest ${copyright}`}
+            className={`text-[10px] uppercase tracking-widest md:text-xs ${copyrightClass}`}
           >
-            © {new Date().getFullYear()} XYZ London. All rights reserved.
+            © {new Date().getFullYear()} {f.copyrightName}. All rights reserved.
           </span>
           <span
-            className={`text-[10px] md:text-xs uppercase tracking-widest ${tagline} mt-2 md:mt-0`}
+            className={`mt-2 text-[10px] uppercase tracking-widest md:mt-0 md:text-xs ${taglineClass}`}
           >
-            Physical / Digital
+            {f.bottomTagline}
           </span>
         </div>
       </Container>
