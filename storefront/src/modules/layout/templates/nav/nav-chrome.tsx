@@ -26,7 +26,7 @@ export default function NavChrome({
   const ooo = isOOORoute(pathname)
 
   const link = ooo
-    ? "text-neutral-400 hover:text-oooText hover:opacity-90 transition-opacity"
+    ? "text-white hover:text-white/90 transition-opacity"
     : digital
       ? "text-neutral-400 hover:text-white hover:opacity-90 transition-opacity"
       : "text-neutral-500 hover:text-deepBlack hover:opacity-70 transition-opacity"
@@ -40,6 +40,8 @@ export default function NavChrome({
   const logoClass = digital || ooo
     ? "flex items-center text-white"
     : "flex items-center text-deepBlack"
+
+  const sideMenuVariant = digital ? "digital" : ooo ? "ooo" : "light"
 
   return (
     <header
@@ -57,10 +59,7 @@ export default function NavChrome({
           </nav>
 
           <div className="md:hidden flex h-full items-center">
-            <SideMenu
-              regions={regions}
-              variant={digital ? "digital" : ooo ? "ooo" : "light"}
-            />
+            <SideMenu regions={regions} variant={sideMenuVariant} />
           </div>
         </div>
 

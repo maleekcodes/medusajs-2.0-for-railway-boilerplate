@@ -34,7 +34,7 @@ const SideMenu = ({
     variant === "digital"
       ? "relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none text-neutral-300 hover:text-white"
       : variant === "ooo"
-        ? "relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none text-neutral-400 hover:text-oooText"
+        ? "relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none text-white hover:text-white/90"
         : "relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
 
   return (
@@ -67,7 +67,13 @@ const SideMenu = ({
                     data-testid="nav-menu-popup"
                     className={`flex flex-col h-full rounded-rounded justify-between p-6 ${variant === "ooo" ? "bg-[rgba(19,17,15,0.92)] backdrop-blur-2xl" : "bg-[rgba(3,7,18,0.5)]"}`}
                   >
-                    <div className="flex justify-end" id="xmark">
+                    <div
+                      className={clx(
+                        "flex justify-end",
+                        variant === "ooo" && "text-white"
+                      )}
+                      id="xmark"
+                    >
                       <button data-testid="close-menu-button" onClick={close}>
                         <XMark />
                       </button>
@@ -78,7 +84,12 @@ const SideMenu = ({
                           <li key={name}>
                             <LocalizedClientLink
                               href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
+                              className={clx(
+                                "text-3xl leading-10",
+                                variant === "ooo"
+                                  ? "text-white hover:text-white/80"
+                                  : "hover:text-ui-fg-disabled"
+                              )}
                               onClick={close}
                               data-testid={`${name.toLowerCase()}-link`}
                             >

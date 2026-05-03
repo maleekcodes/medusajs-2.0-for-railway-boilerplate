@@ -87,7 +87,7 @@ const CartDropdown = ({
               "whitespace-nowrap",
               darkNav
                 ? oooNav
-                  ? "text-neutral-400 hover:text-oooText"
+                  ? "text-white hover:text-white/90"
                   : "text-neutral-300 hover:text-white"
                 : "hover:text-ui-fg-base"
             )}

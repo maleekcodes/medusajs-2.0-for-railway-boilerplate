@@ -12,11 +12,6 @@ module.exports = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        /** Subtle warm lift → deep floor (nav + hero share this) */
-        "ooo-rise":
-          "linear-gradient(165deg, #292520 0%, #1a1715 42%, #13110f 100%)",
-      },
       transitionProperty: {
         width: "width margin",
         height: "height",
@@ -35,6 +30,8 @@ module.exports = {
         oooButton: '#d9cfc3',
         /** OOO / Private Gate accent — burnt orange strikethrough + eyebrow */
         oooAccent: '#E95420',
+        /** OOO nav / landing / footer band */
+        "ooo-rise": "#6B4F36",
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",

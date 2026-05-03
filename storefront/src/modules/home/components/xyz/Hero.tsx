@@ -19,15 +19,13 @@ export function Hero({ headline, subheadline, cta, figureLabels }: HeroProps) {
     document.getElementById("intro")?.scrollIntoView({ behavior: "smooth" })
   }
 
-  const titleContent: ReactNode =
-    headline ||
-    (
-      <>
-        From the unknown
-        <br />
-        to the known.
-      </>
-    )
+  const titleContent: ReactNode = headline || (
+    <>
+      From the unknown
+      <br />
+      to the known.
+    </>
+  )
 
   return (
     <section className="relative min-h-screen flex flex-col md:flex-row overflow-hidden">
@@ -66,12 +64,12 @@ export function Hero({ headline, subheadline, cta, figureLabels }: HeroProps) {
       </div>
 
       {/* Overlay Content */}
-      <div className="absolute inset-0 flex flex-col justify-center items-center pointer-events-none mix-blend-difference text-white px-4 text-center">
+      <div className="absolute  inset-0 flex flex-col justify-center items-center pointer-events-none mix-blend-difference text-white px-4 text-center">
         <motion.h1
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="text-4xl md:text-7xl font-bold tracking-tighter leading-tight"
+          className="text-4xl md:text-7xl font-bold tracking-tighter leading-tight max-w-2xl"
         >
           {titleContent}
         </motion.h1>

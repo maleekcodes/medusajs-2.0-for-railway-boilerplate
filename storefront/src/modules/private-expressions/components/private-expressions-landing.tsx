@@ -84,7 +84,8 @@ export default function PrivateExpressionsLanding({
         )}
         {!sanityConfigured ? (
           <p className="mb-6 max-w-lg text-xs text-amber-200/90" role="status">
-            SANITY_PROJECT_ID is not set — using static fallback copy until the CMS is configured.
+            SANITY_PROJECT_ID is not set — using static fallback copy until the
+            CMS is configured.
           </p>
         ) : null}
         <p className="mb-8 text-xs font-bold uppercase tracking-widest text-oooText/70">
@@ -121,7 +122,8 @@ export default function PrivateExpressionsLanding({
         ) : (
           <p className="max-w-lg text-xs text-amber-200/90">
             Set the form URL in Sanity (hubspotFormUrl), or temporarily use
-            NEXT_PUBLIC_PRIVATE_EXPRESSIONS_TYPEFORM_URL in your environment file.
+            NEXT_PUBLIC_PRIVATE_EXPRESSIONS_TYPEFORM_URL in your environment
+            file.
           </p>
         )}
         <LocalizedClientLink

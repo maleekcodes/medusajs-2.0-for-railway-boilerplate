@@ -22,8 +22,7 @@ const DEFAULT_LINES = [
 ]
 
 /** Legacy homepage copy from older CMS seed */
-const LEGACY_ACCESS_LINE =
-  /access is limited and reviewed over time\.?/i
+const LEGACY_ACCESS_LINE = /access is limited and reviewed over time\.?/i
 
 function normalizeTeaserLine2(line: string): string {
   return LEGACY_ACCESS_LINE.test(line.trim())
@@ -40,7 +39,10 @@ function resolveLines(props: PrivateGateProps): string[] {
   }
   const p = props.paragraph?.trim()
   if (p) {
-    const chunks = p.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean)
+    const chunks = p
+      .split(/\n\s*\n/)
+      .map((x) => x.trim())
+      .filter(Boolean)
     return chunks.length > 0 ? chunks : [p]
   }
   return DEFAULT_LINES
@@ -63,7 +65,7 @@ export function PrivateGate({
   const btn = buttonLabel?.trim() || "Proceed"
 
   return (
-    <section className="relative bg-black py-24 text-white antialiased small:py-32">
+    <section className="relative bg-[#6B4F36] py-24 text-white antialiased small:py-32">
       <Container className="flex flex-col items-center text-center">
         <motion.div
           initial={{ scale: 0.98, opacity: 0 }}
@@ -80,8 +82,7 @@ export function PrivateGate({
           <h2
             className="mb-10 max-w-[min(100%,20ch)] text-balance font-bold leading-[1.06] tracking-tighter text-white"
             style={{
-              fontSize:
-                "clamp(2.125rem, 5.75vw + 0.65rem, min(4.25rem, 11vw))",
+              fontSize: "clamp(2.125rem, 5.75vw + 0.65rem, min(4.25rem, 11vw))",
             }}
           >
             {headline}
