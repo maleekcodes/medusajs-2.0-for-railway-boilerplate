@@ -95,11 +95,9 @@ export function PrivateGate({
               </p>
             ) : null}
             {sub2 ? (
-              <div className="inline-flex max-w-full border border-white/[0.08] bg-zinc-950/90 px-8 py-3.5">
-                <p className="text-[13px] font-light leading-relaxed tracking-tight text-white md:text-sm">
-                  {sub2}
-                </p>
-              </div>
+              <p className="text-[15px] font-normal leading-relaxed tracking-tight text-white md:text-base">
+                {sub2}
+              </p>
             ) : null}
           </div>
 
