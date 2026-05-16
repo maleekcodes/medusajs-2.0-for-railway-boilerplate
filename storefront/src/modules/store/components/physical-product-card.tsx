@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { Plus } from "lucide-react"
+import { useMemo, useState } from "react"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
@@ -16,7 +17,10 @@ export type PhysicalProductCardProps = {
   priceFormatted: string | null
   originalPriceFormatted?: string | null
   priceIsSale?: boolean
-  swatchLabels?: string[]
+  swatches?: {
+    label: string
+    imageUrl?: string | null
+  }[]
 }
 
 export function PhysicalProductCard({
@@ -28,14 +32,36 @@ export function PhysicalProductCard({
   priceFormatted,
   originalPriceFormatted,
   priceIsSale,
-  swatchLabels,
+  swatches,
 }: PhysicalProductCardProps) {
-  const swatches = swatchLabels?.slice(0, 4) ?? []
+  const swatchItems = swatches?.slice(0, 5) ?? []
+  const [activeSwatch, setActiveSwatch] = useState(0)
+
+  const previewImage = useMemo(() => {
+    const active = swatchItems[activeSwatch]?.imageUrl
+    if (active) return active
+    return imageUrl
+  }, [activeSwatch, imageUrl, swatchItems])
+
+  const fallbackSwatchColor = (label: string): string => {
+    const normalized = label.toLowerCase()
+    if (normalized.includes("black")) return "#171717"
+    if (normalized.includes("white")) return "#f5f5f5"
+    if (normalized.includes("grey") || normalized.includes("gray")) return "#9ca3af"
+    if (normalized.includes("navy")) return "#1e3a8a"
+    if (normalized.includes("blue")) return "#3b82f6"
+    if (normalized.includes("red")) return "#dc2626"
+    if (normalized.includes("green")) return "#16a34a"
+    if (normalized.includes("olive")) return "#4d5d3a"
+    if (normalized.includes("brown")) return "#7c4a2d"
+    if (normalized.includes("beige") || normalized.includes("cream")) return "#e7dcc2"
+    return "#d4d4d4"
+  }
 
   return (
     <LocalizedClientLink
       href={`/products/${handle}`}
-      className="block h-full min-h-[400px]"
+      className="block h-full min-h-[520px]"
       data-testid="product-wrapper"
     >
       <motion.div
@@ -44,7 +70,7 @@ export function PhysicalProductCard({
         viewport={{ once: true }}
         whileHover={{ y: -5 }}
         transition={{ duration: 0.4 }}
-        className="group bg-concrete p-6 md:p-8 flex flex-col justify-between min-h-[400px] h-full border border-transparent hover:border-neutral-200 transition-colors"
+        className="group bg-concrete p-4 md:p-5 flex flex-col justify-between min-h-[520px] h-full border border-transparent hover:border-neutral-200 transition-colors"
       >
         <div className="flex justify-between items-start">
           <span className="text-[10px] uppercase tracking-widest font-mono border border-neutral-300 rounded-full px-2 py-0.5 bg-white/50">
@@ -58,16 +84,16 @@ export function PhysicalProductCard({
           </span>
         </div>
 
-        <div className="flex-grow flex items-center justify-center py-8">
-          <div className="relative w-40 max-w-full aspect-square bg-white shadow-sm border border-neutral-100 overflow-hidden">
-            {imageUrl ? (
+        <div className="flex-grow flex items-start justify-center py-4">
+          <div className="relative w-full max-w-[28rem] aspect-[3/4] bg-white shadow-sm border border-neutral-100 overflow-hidden">
+            {previewImage ? (
               <Image
-                src={imageUrl}
+                src={previewImage}
                 alt={title}
                 fill
                 className="object-cover object-center"
-                sizes="160px"
-                quality={60}
+                sizes="(min-width: 1280px) 30vw, (min-width: 768px) 45vw, 95vw"
+                quality={75}
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-neutral-300">
@@ -90,17 +116,37 @@ export function PhysicalProductCard({
                 {subtitle}
               </span>
             </div>
-            {swatches.length > 0 && (
-              <div className="flex gap-1 shrink-0">
-                {swatches.map((c, i) => (
-                  <div
-                    key={`${c}-${i}`}
-                    className={`w-2 h-2 rounded-full border border-neutral-300 ${
-                      i === 0 ? "bg-neutral-800" : "bg-white"
-                    }`}
-                    title={c}
-                  />
-                ))}
+            {swatchItems.length > 0 && (
+              <div className="flex gap-1.5 shrink-0">
+                {swatchItems.map((swatch, i) => {
+                  const selected = i === activeSwatch
+                  return (
+                    <button
+                      key={`${swatch.label}-${i}`}
+                      type="button"
+                      title={swatch.label}
+                      aria-label={`Preview ${swatch.label}`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setActiveSwatch(i)
+                      }}
+                      className={`h-4 w-4 rounded-full border transition-all ${
+                        selected
+                          ? "border-deepBlack ring-1 ring-deepBlack/30"
+                          : "border-neutral-300"
+                      }`}
+                      style={{
+                        backgroundColor: fallbackSwatchColor(swatch.label),
+                        backgroundImage: swatch.imageUrl
+                          ? `url("${swatch.imageUrl}")`
+                          : undefined,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    />
+                  )
+                })}
               </div>
             )}
           </div>

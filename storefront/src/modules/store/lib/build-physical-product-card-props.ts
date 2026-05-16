@@ -9,7 +9,20 @@ function truncateText(text: string | null | undefined, max = 96): string {
   return t.length > max ? `${t.slice(0, max)}…` : t
 }
 
-function extractSwatchLabels(product: HttpTypes.StoreProduct): string[] {
+function normalizeToken(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "")
+}
+
+function toImageUrl(
+  image: HttpTypes.StoreProductImage | { url?: string } | undefined
+): string | null {
+  const url = image?.url
+  return typeof url === "string" && url.trim().length > 0 ? url.trim() : null
+}
+
+function extractSwatches(
+  product: HttpTypes.StoreProduct
+): PhysicalProductCardProps["swatches"] {
   const labels = new Set<string>()
   for (const variant of product.variants ?? []) {
     for (const opt of variant.options ?? []) {
@@ -23,9 +36,31 @@ function extractSwatchLabels(product: HttpTypes.StoreProduct): string[] {
         if (v) labels.add(v)
       }
     }
-    if (labels.size >= 4) break
+    if (labels.size >= 5) break
   }
-  return [...labels].slice(0, 4)
+
+  const swatchLabels = [...labels].slice(0, 5)
+  if (swatchLabels.length === 0) {
+    return []
+  }
+
+  const imagePool = [
+    toImageUrl({ url: product.thumbnail ?? undefined }),
+    ...(product.images ?? []).map((img) => toImageUrl(img)),
+  ].filter((u): u is string => Boolean(u))
+
+  const uniqueImagePool = [...new Set(imagePool)]
+
+  return swatchLabels.map((label, index) => {
+    const token = normalizeToken(label)
+    const matched = uniqueImagePool.find((url) =>
+      normalizeToken(url).includes(token)
+    )
+    return {
+      label,
+      imageUrl: matched ?? uniqueImagePool[index] ?? null,
+    }
+  })
 }
 
 function subtitleForProduct(product: HttpTypes.StoreProduct): string {
@@ -64,6 +99,6 @@ export function buildPhysicalProductCardProps(
         ? cheapestPrice.original_price
         : undefined,
     priceIsSale: cheapestPrice?.price_type === "sale",
-    swatchLabels: extractSwatchLabels(priced),
+    swatches: extractSwatches(priced),
   }
 }

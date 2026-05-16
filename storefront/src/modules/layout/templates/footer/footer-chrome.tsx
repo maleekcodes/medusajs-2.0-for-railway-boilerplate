@@ -158,25 +158,21 @@ export default function FooterChrome({ siteFooter }: Props) {
   const f = mergeFooter(siteFooter ?? null)
 
   const shell = ooo
-    ? "bg-ooo-rise pt-24 pb-12 border-t border-white/[0.08] transition-colors duration-300"
+    ? "bg-oooLight pt-24 pb-12 border-t border-neutral-200 transition-colors duration-300"
     : digital
       ? "bg-deepBlack pt-24 pb-12 border-t border-neutral-800 transition-colors duration-300"
       : "bg-white pt-24 pb-12 border-t border-neutral-100 transition-colors duration-300"
 
-  const heading = ooo ? "text-oooText" : digital ? "text-white" : "text-deepBlack"
-  const body = ooo ? "text-oooText/85" : digital ? "text-neutral-400" : "text-neutral-500"
-  const storyLink = ooo
-    ? "text-sm font-medium text-oooText border-b border-oooBorder pb-0.5 hover:opacity-80 transition-opacity inline-block"
-    : digital
-      ? "text-sm font-medium text-white border-b border-white pb-0.5 hover:opacity-60 transition-opacity inline-block"
-      : "text-sm font-medium text-deepBlack border-b border-deepBlack pb-0.5 hover:opacity-60 transition-opacity inline-block"
-  const bottomBorder = ooo ? "border-oooBorder" : digital ? "border-neutral-800" : "border-neutral-100"
-  const copyrightClass = ooo ? "text-oooText/65" : digital ? "text-neutral-500" : "text-neutral-400"
-  const taglineClass = ooo ? "text-oooText/55" : digital ? "text-neutral-500" : "text-neutral-300"
+  const heading = digital ? "text-white" : "text-deepBlack"
+  const body = digital ? "text-neutral-400" : "text-neutral-500"
+  const storyLink = digital
+    ? "text-sm font-medium text-white border-b border-white pb-0.5 hover:opacity-60 transition-opacity inline-block"
+    : "text-sm font-medium text-deepBlack border-b border-deepBlack pb-0.5 hover:opacity-60 transition-opacity inline-block"
+  const bottomBorder = digital ? "border-neutral-800" : "border-neutral-200"
+  const copyrightClass = digital ? "text-neutral-500" : "text-neutral-400"
+  const taglineClass = digital ? "text-neutral-500" : "text-neutral-300"
 
-  const linkClass = ooo
-    ? "text-oooText/90 hover:opacity-80 transition-opacity"
-    : "hover:opacity-70 transition-opacity"
+  const linkClass = "hover:opacity-70 transition-opacity"
 
   return (
     <footer className={shell}>

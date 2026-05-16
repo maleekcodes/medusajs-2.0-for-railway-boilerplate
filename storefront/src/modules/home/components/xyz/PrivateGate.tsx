@@ -65,7 +65,7 @@ export function PrivateGate({
   const btn = buttonLabel?.trim() || "Proceed"
 
   return (
-    <section className="relative bg-[#6B4F36] py-24 text-white antialiased small:py-32">
+    <section className="relative bg-black py-24 text-white antialiased small:py-32">
       <Container className="flex flex-col items-center text-center">
         <motion.div
           initial={{ scale: 0.98, opacity: 0 }}

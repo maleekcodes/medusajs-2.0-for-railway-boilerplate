@@ -25,23 +25,21 @@ export default function NavChrome({
   const digital = isDigitalRoute(pathname)
   const ooo = isOOORoute(pathname)
 
-  const link = ooo
-    ? "text-white hover:text-white/90 transition-opacity"
-    : digital
-      ? "text-neutral-400 hover:text-white hover:opacity-90 transition-opacity"
-      : "text-neutral-500 hover:text-deepBlack hover:opacity-70 transition-opacity"
+  const link = digital
+    ? "text-neutral-400 hover:text-white hover:opacity-90 transition-opacity"
+    : "text-neutral-500 hover:text-deepBlack hover:opacity-70 transition-opacity"
 
   const header = ooo
-    ? "bg-ooo-rise text-white border-white/[0.08] border-b"
+    ? "bg-oooLight text-deepBlack border-neutral-200 border-b"
     : digital
       ? "bg-deepBlack text-white border-neutral-800 border-b"
       : "bg-white text-deepBlack border-neutral-100 border-b"
 
-  const logoClass = digital || ooo
+  const logoClass = digital
     ? "flex items-center text-white"
     : "flex items-center text-deepBlack"
 
-  const sideMenuVariant = digital ? "digital" : ooo ? "ooo" : "light"
+  const sideMenuVariant = digital ? "digital" : "light"
 
   return (
     <header

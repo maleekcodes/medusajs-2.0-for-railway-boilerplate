@@ -32,6 +32,8 @@ module.exports = {
         oooAccent: '#E95420',
         /** OOO nav / landing / footer band */
         "ooo-rise": "#6B4F36",
+        /** OOO private-expressions page — premium light gray shell */
+        oooLight: "#EBEBEB",
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
