@@ -6,6 +6,8 @@ import {
   retrieveCart,
   transferCartToSessionCustomer,
 } from "@lib/data/cart"
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings, getStaticPageSeoFields } from "@lib/seo/sanity"
 import Wrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
@@ -13,11 +15,23 @@ import { Container } from "@modules/common/components/xyz/Container"
 import { HttpTypes } from "@medusajs/types"
 import { getCustomer } from "@lib/data/customer"
 
-export const metadata: Metadata = {
-  title: "Checkout | XYZ London",
-  description:
-    "Complete your XYZ London order — shipping and secure payment.",
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const [global, seo] = await Promise.all([
+    getGlobalSeoSettings(),
+    getStaticPageSeoFields("checkout"),
+  ])
+
+  return buildPageMetadata(
+    {
+      title: seo?.seoTitle ?? "Checkout | XYZ London",
+      description:
+        seo?.seoDescription ??
+        "Complete your XYZ London order — shipping and secure payment.",
+      path: "/checkout",
+      noIndex: true,
+    },
+    global
+  )
 }
 
 async function prepareCheckout() {

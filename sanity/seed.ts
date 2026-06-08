@@ -186,12 +186,19 @@ const siteSettings = {
   _id: 'siteSettings',
   _type: 'siteSettings',
   title: 'XYZ London',
-  description: 'A fashion house exploring identity through physical and digital expression.',
+  description:
+    'Premium luxury garments and refined headwear designed through craftsmanship, timeless form, elevated proportions, and minimalist expression.',
+  seoTitle: 'XYZ London | Premium Luxury Streetwear & Refined Headwear',
+  seoDescription:
+    'Premium luxury garments and refined headwear designed through craftsmanship, timeless form, elevated proportions, and minimalist expression.',
+  organizationDescription:
+    'Premium luxury fashion house focused on premium streetwear, refined craftsmanship, elevated garments, headwear, sneakers, and digital fashion innovation.',
   heroHeadline: 'From the unknown to the known.',
   heroSubheadline: 'A fashion house exploring identity through physical and digital expression.',
   socialLinks: {
     instagram: 'https://instagram.com/xyzlondon',
     twitter: 'https://x.com/xyzlondon',
+    pinterest: 'https://pinterest.com/xyzlondon',
     email: 'contact@xyzwear.com',
   },
 }
@@ -200,6 +207,9 @@ const siteSettings = {
 const homePage = {
   _id: 'homePage',
   _type: 'homePage',
+  seoTitle: 'XYZ London | Premium Luxury Streetwear & Refined Headwear',
+  seoDescription:
+    'Premium luxury garments and refined headwear designed through craftsmanship, timeless form, elevated proportions, and minimalist expression.',
   // Hero
   heroHeadline: 'From the unknown to the known.',
   heroSubheadline: 'A fashion house exploring identity through physical and digital expression.',
@@ -209,7 +219,22 @@ const homePage = {
     digital: 'Fig 02. Digital',
   },
   // Introduction - v1 single paragraph style
-  introText: 'XYZ London is a fashion house built on intent. In a world of noise, speed, and constant repetition, we choose restraint. We focus on form, premium material, and proportion — the quiet elements that shape how identity is expressed.',
+  introText: [
+    {
+      _type: 'block',
+      _key: 'intro-1',
+      style: 'normal',
+      markDefs: [],
+      children: [
+        {
+          _type: 'span',
+          _key: 'intro-1-span',
+          text: 'XYZ London is a fashion house built on intent. In a world of noise, speed, and constant repetition, we choose restraint. We focus on form, premium material, and proportion — the quiet elements that shape how identity is expressed.',
+          marks: [],
+        },
+      ],
+    },
+  ],
   // Philosophy / Manifesto section - v1 style with 4 lines
   manifestoLines: [
     'XYZ London exists to uncover identity, not define it.',
@@ -439,6 +464,59 @@ const digitalFormPage = {
   seoDescription: 'Digital expressions exploring identity beyond physical constraints.',
 }
 
+const staticPageSeo = {
+  _id: 'staticPageSeo',
+  _type: 'staticPageSeo',
+  store: {
+    seoTitle: 'Physical Form | XYZ London',
+    seoDescription:
+      'Tangible expressions of identity. Architectural fluidity tailored for the human form.',
+  },
+  journal: {
+    seoTitle: 'Journal | XYZ London',
+    seoDescription:
+      'The narrative of form. A visual archive of our process, inspiration, and dialogue.',
+  },
+  contact: {
+    seoTitle: 'Contact | XYZ London',
+    seoDescription:
+      'Get in touch with XYZ London — orders, support, returns, and general enquiries.',
+  },
+  termsOfUse: {
+    seoTitle: 'Terms of Service | XYZ London',
+    seoDescription:
+      'Terms governing use of the XYZ London website and services, including OOO.',
+  },
+  privacyPolicy: {
+    seoTitle: 'Privacy Policy | XYZ London',
+    seoDescription:
+      'How XYZ London collects, uses, and protects your personal data when you use our website and services, including OOO.',
+  },
+  shippingPolicy: {
+    seoTitle: 'Shipping Policy | XYZ London',
+    seoDescription:
+      'Shipping, processing, duties, tracking, and OOO timelines for XYZ London orders.',
+  },
+  cart: {
+    seoTitle: 'Cart | XYZ London',
+    seoDescription: 'Review items in your XYZ London cart before checkout.',
+  },
+  checkout: {
+    seoTitle: 'Checkout | XYZ London',
+    seoDescription:
+      'Complete your XYZ London order — shipping and secure payment.',
+  },
+  search: {
+    seoTitle: 'Search | XYZ London',
+    seoDescription:
+      'Explore premium luxury streetwear and refined headwear from XYZ London.',
+  },
+  notFound: {
+    seoTitle: 'Page Not Found | XYZ London',
+    seoDescription: 'The page you tried to access does not exist.',
+  },
+}
+
 
 // ============================================================================
 // SEED FUNCTIONS
@@ -538,6 +616,17 @@ async function seedSiteFooterDoc() {
   }
 }
 
+async function seedStaticPageSeo() {
+  console.log('\n--- Seeding Static Page SEO ---')
+
+  try {
+    await client.createOrReplace(staticPageSeo)
+    console.log(`  [OK] Static Page SEO`)
+  } catch (error) {
+    console.error(`  [FAIL] Static Page SEO:`, error)
+  }
+}
+
 // ============================================================================
 // MAIN
 // ============================================================================
@@ -560,10 +649,11 @@ async function main() {
   await seedDigitalFormPage()
   await seedPrivateExpressionsPage()
   await seedSiteFooterDoc()
+  await seedStaticPageSeo()
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(2)
 
-  const totalDocuments = journalPosts.length + 7
+  const totalDocuments = journalPosts.length + 8
 
   console.log('\n' + '='.repeat(60))
   console.log('SEED COMPLETE')
@@ -577,6 +667,7 @@ async function main() {
   console.log(`  - Digital Form Page: 1`)
   console.log(`  - Private Expressions (OOO): 1`)
   console.log(`  - Site footer: 1`)
+  console.log(`  - Static Page SEO: 1`)
   console.log(`\nTotal documents: ${totalDocuments}`)
   console.log(`Time: ${elapsed}s`)
   console.log('\nNext steps:')

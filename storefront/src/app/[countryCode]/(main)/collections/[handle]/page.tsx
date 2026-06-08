@@ -1,6 +1,9 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
+import { SITE_NAME } from "@lib/seo/site"
 import {
   getCollectionByHandle,
   getCollectionsList,
@@ -52,19 +55,24 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { handle } = await params
-  const collection = await getCollectionByHandle(handle)
+  const { handle, countryCode } = await params
+  const [global, collection] = await Promise.all([
+    getGlobalSeoSettings(),
+    getCollectionByHandle(handle),
+  ])
 
   if (!collection) {
     notFound()
   }
 
-  const metadata = {
-    title: `${collection.title} | Medusa Store`,
-    description: `${collection.title} collection`,
-  } as Metadata
-
-  return metadata
+  return buildPageMetadata(
+    {
+      title: `${collection.title} | ${SITE_NAME}`,
+      description: `${collection.title} — premium luxury collection from ${SITE_NAME}.`,
+      path: `/${countryCode}/collections/${handle}`,
+    },
+    global
+  )
 }
 
 export default async function CollectionPage({ params, searchParams }: Props) {

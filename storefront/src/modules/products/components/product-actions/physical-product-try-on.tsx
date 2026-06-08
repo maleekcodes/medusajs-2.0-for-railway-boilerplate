@@ -163,11 +163,14 @@ export function PhysicalProductTryOn({
           setPreviewUrl(null)
           setUserPhotoPreview(null)
         }}
-        className="shrink-0 rounded border border-neutral-200 bg-white p-2 text-deepBlack transition-colors hover:border-deepBlack hover:bg-neutral-50"
-        aria-label="Try-on"
+        className="flex shrink-0 items-center gap-2 rounded border border-neutral-200 bg-white px-3 py-2 text-deepBlack transition-colors hover:border-deepBlack hover:bg-neutral-50"
+        aria-label="Try on"
         title="Try it on"
         data-testid="physical-try-on-open"
       >
+        <span className="text-xs font-medium uppercase tracking-[0.15em]">
+          Try on
+        </span>
         <ScanFace className="h-[18px] w-[18px]" strokeWidth={1.5} aria-hidden />
       </button>
 

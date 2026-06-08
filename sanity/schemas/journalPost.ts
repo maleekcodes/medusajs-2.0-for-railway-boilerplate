@@ -1,10 +1,14 @@
 import { defineType, defineField } from 'sanity'
 
+import { seoFields } from './objects/seo'
+
 export default defineType({
   name: 'journalPost',
   title: 'Journal Post',
   type: 'document',
   fields: [
+    ...seoFields,
+
     defineField({
       name: 'title',
       title: 'Title',

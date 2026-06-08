@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import OrderDetailsTemplate from "@modules/order/templates/order-details-template"
 import { retrieveOrder } from "@lib/data/orders"
 import { enrichLineItems } from "@lib/data/cart"
@@ -33,10 +34,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound()
   }
 
-  return {
-    title: `Order #${order.display_id}`,
-    description: `View your order`,
-  }
+  return buildUtilityPageMetadata(
+    `Order #${order.display_id} | XYZ London`,
+    "View your order details."
+  )
 }
 
 export default async function OrderDetailPage({ params }: Props) {

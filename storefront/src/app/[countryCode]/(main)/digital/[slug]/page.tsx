@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import { notFound, redirect } from "next/navigation"
 
 import { normalizeDigitalPdpSlug } from "@lib/digital/normalize-digital-slug"
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
+import { SITE_NAME } from "@lib/seo/site"
 import DigitalProductTemplate from "@modules/digital-product/templates/digital-product-template"
 import { resolveDigitalProductPage } from "@modules/digital-product/lib/resolve-digital-product-page"
 
@@ -10,14 +13,23 @@ type Params = {
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { slug } = await params
+  const { countryCode, slug } = await params
   const canonical = normalizeDigitalPdpSlug(slug) || slug
-  const resolved = await resolveDigitalProductPage(canonical)
+  const [global, resolved] = await Promise.all([
+    getGlobalSeoSettings(),
+    resolveDigitalProductPage(canonical),
+  ])
   const name = resolved?.context.product?.name
-  return {
-    title: name ? `${name} | Digital` : "Digital product",
-    description: resolved?.context.product?.description ?? undefined,
-  }
+
+  return buildPageMetadata(
+    {
+      title: name ? `${name} | Digital | ${SITE_NAME}` : "Digital product",
+      description: resolved?.context.product?.description ?? undefined,
+      path: `/${countryCode}/digital/${canonical}`,
+      image: resolved?.context.product?.previewImage,
+    },
+    global
+  )
 }
 
 export default async function DigitalProductPage({ params }: Params) {

@@ -1,3 +1,5 @@
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
 import { SITE_DESCRIPTION, SITE_TITLE_DEFAULT } from "@lib/seo/site"
 import { Metadata } from "next"
 
@@ -15,13 +17,21 @@ import {
   getPrivateExpressionsPage,
 } from "@lib/sanity/queries"
 
-export const metadata: Metadata = {
-  title: SITE_TITLE_DEFAULT,
-  description: SITE_DESCRIPTION,
-  openGraph: {
-    title: SITE_TITLE_DEFAULT,
-    description: SITE_DESCRIPTION,
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const [global, homePageResult] = await Promise.all([
+    getGlobalSeoSettings(),
+    getHomePage(),
+  ])
+  const page = homePageResult.page
+
+  return buildPageMetadata(
+    {
+      title: page?.seoTitle?.trim() || SITE_TITLE_DEFAULT,
+      description: page?.seoDescription?.trim() || SITE_DESCRIPTION,
+      path: "/",
+    },
+    global
+  )
 }
 
 export default async function Home({

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 
 import { normalizeDigitalPdpSlug } from "@lib/digital/normalize-digital-slug"
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import { Container } from "@modules/common/components/xyz/Container"
 import { DigitalPurchaseSuccessClient } from "@modules/digital-product/components/digital-purchase-success-client"
 
@@ -10,10 +11,11 @@ type Params = {
   searchParams: Promise<{ session_id?: string }>
 }
 
-export const metadata: Metadata = {
-  title: "Purchase complete | XYZ London",
-  description: "Your XYZ London digital purchase is complete.",
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  return buildUtilityPageMetadata(
+    "Purchase complete | XYZ London",
+    "Your XYZ London digital purchase is complete."
+  )
 }
 
 export default async function DigitalPurchaseSuccessPage({

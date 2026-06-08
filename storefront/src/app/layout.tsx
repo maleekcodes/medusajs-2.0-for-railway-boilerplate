@@ -1,8 +1,27 @@
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { buildOrganizationSchema } from "@lib/seo/schema"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
 import { rootMetadata } from "@lib/seo/site"
+import { getSiteSettings } from "@lib/sanity/queries"
+import JsonLd from "@modules/seo/components/json-ld"
 import type { Metadata, Viewport } from "next"
 import "styles/globals.css"
 
-export const metadata: Metadata = rootMetadata()
+export async function generateMetadata(): Promise<Metadata> {
+  const global = await getGlobalSeoSettings()
+  return {
+    ...rootMetadata(),
+    ...buildPageMetadata(
+      {
+        title: global?.seoTitle,
+        description: global?.seoDescription,
+        image: global?.ogImage,
+        twitterImage: global?.twitterImage,
+      },
+      global
+    ),
+  }
+}
 
 export const viewport: Viewport = {
   themeColor: "#0a0a0a",
@@ -10,10 +29,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default async function RootLayout(props: { children: React.ReactNode }) {
+  const { settings } = await getSiteSettings()
+  const organizationSchema = buildOrganizationSchema(settings)
+
   return (
     <html lang="en" data-mode="light">
       <head>
+        <JsonLd data={organizationSchema} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

@@ -1,15 +1,18 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import AccountPageHeader from "@modules/account/components/account-page-header"
 import AddressBook from "@modules/account/components/address-book"
 
 import { getRegion } from "@lib/data/regions"
 import { getCustomer } from "@lib/data/customer"
 
-export const metadata: Metadata = {
-  title: "Addresses",
-  description: "View your addresses",
+export async function generateMetadata(): Promise<Metadata> {
+  return buildUtilityPageMetadata(
+    "Addresses | XYZ London",
+    "View and manage your saved addresses."
+  )
 }
 
 export default async function Addresses({

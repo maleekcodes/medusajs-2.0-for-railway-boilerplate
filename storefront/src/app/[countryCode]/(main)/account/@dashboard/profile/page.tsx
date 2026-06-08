@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import AccountPageHeader from "@modules/account/components/account-page-header"
 import ProfilePhone from "@modules/account/components/profile-phone"
 import ProfileBillingAddress from "@modules/account/components/profile-billing-address"
@@ -11,9 +12,11 @@ import { notFound } from "next/navigation"
 import { listRegions } from "@lib/data/regions"
 import { getCustomer } from "@lib/data/customer"
 
-export const metadata: Metadata = {
-  title: "Profile",
-  description: "View and edit your XYZ London account profile.",
+export async function generateMetadata(): Promise<Metadata> {
+  return buildUtilityPageMetadata(
+    "Profile | XYZ London",
+    "View and edit your XYZ London account profile."
+  )
 }
 
 export default async function Profile() {

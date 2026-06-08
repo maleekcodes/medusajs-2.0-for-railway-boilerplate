@@ -1,10 +1,15 @@
 import { defineType, defineField } from 'sanity'
 
+import { seoFields } from './objects/seo'
+import { simpleRichTextMember } from './objects/simpleRichText'
+
 export default defineType({
   name: 'homePage',
   title: 'Home Page',
   type: 'document',
   fields: [
+    ...seoFields,
+
     // Hero Section
     defineField({
       name: 'heroHeadline',
@@ -74,10 +79,11 @@ export default defineType({
     }),
     defineField({
       name: 'introText',
-      title: 'Introduction Text (Simple)',
-      type: 'text',
-      rows: 4,
-      description: 'Single paragraph introduction text for the home page',
+      title: 'Introduction Text',
+      type: 'array',
+      description:
+        'Introduction copy for the home page. Press Enter for a new paragraph — formatting is preserved on the storefront.',
+      of: [simpleRichTextMember],
     }),
 
     // Philosophy / Digital Form Section

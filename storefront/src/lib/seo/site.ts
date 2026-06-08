@@ -2,13 +2,14 @@ import type { Metadata } from "next"
 
 import { getBaseURL } from "@lib/util/env"
 
-/** Aligned with xyz-london-v2 `__root` default title */
+/** Aligned with XYZ London SEO strategy */
 export const SITE_NAME = "XYZ London"
 
-export const SITE_TITLE_DEFAULT = `${SITE_NAME} | Physical & Digital Form`
+export const SITE_TITLE_DEFAULT =
+  "XYZ London | Premium Luxury Streetwear & Refined Headwear"
 
 export const SITE_DESCRIPTION =
-  "A fashion house exploring identity through physical and digital expression."
+  "Premium luxury garments and refined headwear designed through craftsmanship, timeless form, elevated proportions, and minimalist expression."
 
 const base = () => new URL(getBaseURL())
 

@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import OrderCompletedTemplate from "@modules/order/templates/order-completed-template"
 import { notFound } from "next/navigation"
 import { enrichLineItems } from "@lib/data/cart"
@@ -25,10 +26,11 @@ async function getOrder(id: string) {
   } as unknown as HttpTypes.StoreOrder
 }
 
-export const metadata: Metadata = {
-  title: "Order Confirmed | XYZ London",
-  description: "Your XYZ London order was placed successfully.",
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  return buildUtilityPageMetadata(
+    "Order Confirmed | XYZ London",
+    "Your XYZ London order was placed successfully."
+  )
 }
 
 export default async function OrderConfirmedPage({ params }: Props) {

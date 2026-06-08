@@ -6,6 +6,7 @@ import aboutPage from './aboutPage'
 import arFitPage from './arFitPage'
 import digitalFormPage from './digitalFormPage'
 import privateExpressionsPage from './privateExpressionsPage'
+import staticPageSeo from './staticPageSeo'
 
 export const schemaTypes = [
   siteSettings,
@@ -16,4 +17,5 @@ export const schemaTypes = [
   arFitPage,
   digitalFormPage,
   privateExpressionsPage,
+  staticPageSeo,
 ]

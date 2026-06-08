@@ -1,12 +1,26 @@
 import type { Metadata } from "next"
 
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings, getStaticPageSeoFields } from "@lib/seo/sanity"
 import { getJournalEntries } from "@lib/sanity/queries"
 import JournalIndexTemplate from "@modules/journal/templates/journal-index-template"
 
-export const metadata: Metadata = {
-  title: "Journal | XYZ London",
-  description:
-    "The narrative of form. A visual archive of our process, inspiration, and dialogue.",
+export async function generateMetadata(): Promise<Metadata> {
+  const [global, seo] = await Promise.all([
+    getGlobalSeoSettings(),
+    getStaticPageSeoFields("journal"),
+  ])
+
+  return buildPageMetadata(
+    {
+      title: seo?.seoTitle ?? "Journal | XYZ London",
+      description:
+        seo?.seoDescription ??
+        "The narrative of form. A visual archive of our process, inspiration, and dialogue.",
+      path: "/journal",
+    },
+    global
+  )
 }
 
 export const revalidate = 60

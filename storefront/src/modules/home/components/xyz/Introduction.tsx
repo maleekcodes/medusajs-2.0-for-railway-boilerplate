@@ -1,14 +1,59 @@
 "use client"
 
+import { PortableText } from "@portabletext/react"
+import type { TypedObject } from "@portabletext/types"
 import { motion } from "framer-motion"
+
 import { Container } from "@modules/common/components/xyz/Container"
+import { introPortableTextComponents } from "@modules/home/lib/intro-portable-text"
+
+type IntroContent = TypedObject[] | string | null | undefined
 
 interface IntroductionProps {
-  text?: string
+  text?: IntroContent
 }
 
 const defaultText =
   "XYZ London is a fashion house built on intent. In a world of noise, speed, and constant repetition, we choose restraint. We focus on form, premium material, and proportion — the quiet elements that shape how identity is expressed."
+
+function isPortableText(value: IntroContent): value is TypedObject[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    typeof value[0] === "object" &&
+    value[0] !== null &&
+    "_type" in value[0]
+  )
+}
+
+function IntroBody({ content }: { content: IntroContent }) {
+  if (isPortableText(content)) {
+    return (
+      <div className="space-y-6">
+        <PortableText
+          value={content}
+          components={introPortableTextComponents}
+        />
+      </div>
+    )
+  }
+
+  const plain = (typeof content === "string" && content.trim()) || defaultText
+  const paragraphs = plain.split(/\n\s*\n/).filter((p) => p.trim())
+
+  return (
+    <div className="space-y-6">
+      {paragraphs.map((paragraph, index) => (
+        <p
+          key={index}
+          className="text-xl md:text-2xl font-light leading-relaxed text-deepBlack"
+        >
+          {paragraph.trim()}
+        </p>
+      ))}
+    </div>
+  )
+}
 
 export function Introduction({ text }: IntroductionProps) {
   return (
@@ -21,9 +66,7 @@ export function Introduction({ text }: IntroductionProps) {
           transition={{ duration: 0.8 }}
           className="max-w-2xl text-center"
         >
-          <p className="text-xl md:text-2xl font-light leading-relaxed text-deepBlack">
-            {text || defaultText}
-          </p>
+          <IntroBody content={text} />
           <div className="w-px h-16 bg-neutral-200 mx-auto mt-12" />
         </motion.div>
       </Container>

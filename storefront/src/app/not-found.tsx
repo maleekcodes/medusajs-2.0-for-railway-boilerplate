@@ -3,9 +3,24 @@ import { Text } from "@medusajs/ui"
 import { Metadata } from "next"
 import Link from "next/link"
 
-export const metadata: Metadata = {
-  title: "404",
-  description: "Something went wrong",
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings, getStaticPageSeoFields } from "@lib/seo/sanity"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [global, seo] = await Promise.all([
+    getGlobalSeoSettings(),
+    getStaticPageSeoFields("notFound"),
+  ])
+
+  return buildPageMetadata(
+    {
+      title: seo?.seoTitle ?? "Page Not Found | XYZ London",
+      description:
+        seo?.seoDescription ?? "The page you tried to access does not exist.",
+      noIndex: true,
+    },
+    global
+  )
 }
 
 export default function NotFound() {

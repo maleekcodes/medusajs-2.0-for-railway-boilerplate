@@ -10,7 +10,7 @@ export type ShapeType =
   | "ellipse"
   | "curve"
 
-export interface JournalEntry {
+export interface JournalEntry extends PageSeoFields {
   id: string
   slug: string
   title: string
@@ -96,8 +96,43 @@ export type DigitalFormPageSanity = {
 
 // ============ Page Content Types ============
 
+export type PageSeoFields = {
+  seoTitle?: string | null
+  seoDescription?: string | null
+}
+
+export type SiteSettingsSanity = {
+  title?: string | null
+  description?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
+  logoUrl?: string | null
+  ogImage?: string | null
+  twitterImage?: string | null
+  organizationDescription?: string | null
+  socialLinks?: {
+    instagram?: string | null
+    twitter?: string | null
+    pinterest?: string | null
+    email?: string | null
+  } | null
+}
+
+export type StaticPageSeoSanity = {
+  store?: PageSeoFields | null
+  journal?: PageSeoFields | null
+  contact?: PageSeoFields | null
+  termsOfUse?: PageSeoFields | null
+  privacyPolicy?: PageSeoFields | null
+  shippingPolicy?: PageSeoFields | null
+  cart?: PageSeoFields | null
+  checkout?: PageSeoFields | null
+  search?: PageSeoFields | null
+  notFound?: PageSeoFields | null
+}
+
 /** Full home page content from Sanity */
-export type HomePageSanity = {
+export type HomePageSanity = PageSeoFields & {
   // Hero
   heroHeadline?: string | null
   heroSubheadline?: string | null
@@ -111,7 +146,7 @@ export type HomePageSanity = {
   introHeadline?: string | null
   introHeadlineAccent?: string | null
   introParagraph?: string | null
-  introText?: string | null
+  introText?: unknown[] | string | null
   // Philosophy
   philosophyTitle?: string | null
   philosophyComingLabel?: string | null

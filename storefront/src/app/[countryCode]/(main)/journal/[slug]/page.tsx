@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
 import { getJournalPost } from "@lib/sanity/queries"
 import JournalPostTemplate from "@modules/journal/templates/journal-post-template"
 
@@ -12,14 +14,24 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const post = await getJournalPost(slug)
+  const [global, post] = await Promise.all([
+    getGlobalSeoSettings(),
+    getJournalPost(slug),
+  ])
+
   if (!post) {
-    return { title: "Journal | XYZ London" }
+    return buildPageMetadata({ title: "Journal | XYZ London" }, global)
   }
-  return {
-    title: `${post.title} | XYZ London Journal`,
-    description: post.excerpt ?? undefined,
-  }
+
+  return buildPageMetadata(
+    {
+      title: post.seoTitle?.trim() || `${post.title} | XYZ London Journal`,
+      description: post.seoDescription?.trim() || post.excerpt || undefined,
+      path: `/journal/${slug}`,
+      image: post.featuredImage,
+    },
+    global
+  )
 }
 
 export default async function JournalPostPage({ params }: Props) {

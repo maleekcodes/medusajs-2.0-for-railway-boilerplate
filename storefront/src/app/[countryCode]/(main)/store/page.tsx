@@ -1,12 +1,26 @@
 import { Metadata } from "next"
 
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings, getStaticPageSeoFields } from "@lib/seo/sanity"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import StoreTemplate from "@modules/store/templates"
 
-export const metadata: Metadata = {
-  title: "Physical Form | XYZ London",
-  description:
-    "Tangible expressions of identity. Architectural fluidity tailored for the human form.",
+export async function generateMetadata(): Promise<Metadata> {
+  const [global, seo] = await Promise.all([
+    getGlobalSeoSettings(),
+    getStaticPageSeoFields("store"),
+  ])
+
+  return buildPageMetadata(
+    {
+      title: seo?.seoTitle ?? "Physical Form | XYZ London",
+      description:
+        seo?.seoDescription ??
+        "Tangible expressions of identity. Architectural fluidity tailored for the human form.",
+      path: "/store",
+    },
+    global
+  )
 }
 
 type Params = {

@@ -1,13 +1,16 @@
 import { Metadata } from "next"
 
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import Overview from "@modules/account/components/overview"
 import { notFound } from "next/navigation"
 import { getCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 
-export const metadata: Metadata = {
-  title: "Account",
-  description: "Overview of your account activity.",
+export async function generateMetadata(): Promise<Metadata> {
+  return buildUtilityPageMetadata(
+    "Account | XYZ London",
+    "Overview of your account activity."
+  )
 }
 
 export default async function OverviewTemplate() {

@@ -1,8 +1,12 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { buildProductSchema } from "@lib/seo/schema"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
 import { SITE_NAME } from "@lib/seo/site"
 import ProductTemplate from "@modules/products/templates"
+import JsonLd from "@modules/seo/components/json-ld"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { getProductByHandle, getProductsList } from "@lib/data/products"
 
@@ -57,20 +61,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     notFound()
   }
 
+  const global = await getGlobalSeoSettings()
   const title = `${product.title} | ${SITE_NAME}`
   const description =
     product.description?.replace(/<[^>]*>/g, "").trim().slice(0, 160) ||
     `${product.title} — ${SITE_NAME}.`
 
-  return {
-    title,
-    description,
-    openGraph: {
+  return buildPageMetadata(
+    {
       title,
       description,
-      images: product.thumbnail ? [product.thumbnail] : [],
+      path: `/${countryCode}/products/${handle}`,
+      image: product.thumbnail,
     },
-  }
+    global
+  )
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -86,11 +91,19 @@ export default async function ProductPage({ params }: Props) {
     notFound()
   }
 
+  const productSchema = buildProductSchema({
+    product: pricedProduct,
+    countryCode,
+  })
+
   return (
-    <ProductTemplate
-      product={pricedProduct}
-      region={region}
-      countryCode={countryCode}
-    />
+    <>
+      <JsonLd data={productSchema} />
+      <ProductTemplate
+        product={pricedProduct}
+        region={region}
+        countryCode={countryCode}
+      />
+    </>
   )
 }

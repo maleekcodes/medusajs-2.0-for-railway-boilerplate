@@ -1,6 +1,9 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
+import { buildPageMetadata } from "@lib/seo/metadata"
+import { getGlobalSeoSettings } from "@lib/seo/sanity"
+import { SITE_NAME } from "@lib/seo/site"
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { StoreProductCategory, StoreRegion } from "@medusajs/types"
@@ -44,8 +47,11 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { category } = await params
-    const { product_categories } = await getCategoryByHandle(category)
+    const { category, countryCode } = await params
+    const [global, { product_categories }] = await Promise.all([
+      getGlobalSeoSettings(),
+      getCategoryByHandle(category),
+    ])
 
     const title = product_categories
       .map((category: StoreProductCategory) => category.name)
@@ -53,15 +59,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const description =
       product_categories[product_categories.length - 1].description ??
-      `${title} category.`
+      `${title} — premium luxury category from ${SITE_NAME}.`
 
-    return {
-      title: `${title} | Medusa Store`,
-      description,
-      alternates: {
-        canonical: `${category.join("/")}`,
+    return buildPageMetadata(
+      {
+        title: `${title} | ${SITE_NAME}`,
+        description,
+        path: `/${countryCode}/categories/${category.join("/")}`,
       },
-    }
+      global
+    )
   } catch (error) {
     notFound()
   }

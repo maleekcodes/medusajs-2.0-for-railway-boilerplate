@@ -1,10 +1,13 @@
 import { Metadata } from "next"
 
+import { buildUtilityPageMetadata } from "@lib/seo/utility"
 import LoginTemplate from "@modules/account/templates/login-template"
 
-export const metadata: Metadata = {
-  title: "Sign in",
-  description: "Sign in to your Medusa Store account.",
+export async function generateMetadata(): Promise<Metadata> {
+  return buildUtilityPageMetadata(
+    "Sign in | XYZ London",
+    "Sign in to your XYZ London account."
+  )
 }
 
 export default function Login() {

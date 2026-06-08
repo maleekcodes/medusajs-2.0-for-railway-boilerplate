@@ -16,6 +16,20 @@ export default defineType({
       title: 'Site Description',
       type: 'text',
       rows: 3,
+      description: 'Default meta description and Organization schema description fallback.',
+    }),
+    defineField({
+      name: 'seoTitle',
+      title: 'Default SEO Title',
+      type: 'string',
+      description: 'Fallback title for pages without a specific SEO title in Sanity.',
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'Default SEO Description',
+      type: 'text',
+      rows: 3,
+      description: 'Fallback meta description for pages without specific SEO copy.',
     }),
     defineField({
       name: 'logo',
@@ -24,6 +38,27 @@ export default defineType({
       options: {
         hotspot: true,
       },
+    }),
+    defineField({
+      name: 'ogImage',
+      title: 'Open Graph Image',
+      type: 'image',
+      description: 'Default social share image (1200×630 recommended).',
+      options: { hotspot: true },
+    }),
+    defineField({
+      name: 'twitterImage',
+      title: 'Twitter/X Image',
+      type: 'image',
+      description: 'Optional override for Twitter/X cards. Falls back to Open Graph image.',
+      options: { hotspot: true },
+    }),
+    defineField({
+      name: 'organizationDescription',
+      title: 'Organization Description',
+      type: 'text',
+      rows: 3,
+      description: 'Used in Organization JSON-LD schema on every page.',
     }),
     defineField({
       name: 'socialLinks',
@@ -38,6 +73,11 @@ export default defineType({
         defineField({
           name: 'twitter',
           title: 'Twitter/X URL',
+          type: 'url',
+        }),
+        defineField({
+          name: 'pinterest',
+          title: 'Pinterest URL',
           type: 'url',
         }),
         defineField({

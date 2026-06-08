@@ -1,5 +1,7 @@
 import "server-only"
 
+import { cache } from "react"
+
 import type {
   DigitalFormPageSanity,
   DigitalProductDetailSanity,
@@ -9,6 +11,8 @@ import type {
   ArFitPageSanity,
   PrivateExpressionsPageSanity,
   SiteFooterSanity,
+  SiteSettingsSanity,
+  StaticPageSeoSanity,
 } from "@/types/xyz"
 
 import {
@@ -119,6 +123,8 @@ const digitalFormProductSlugListQuery = `*[_type == "digitalFormPage"][0]{
 const journalPostQuery = `*[_type == "journalPost" && slug.current == $slug][0] {
   "id": _id,
   "slug": slug.current,
+  seoTitle,
+  seoDescription,
   title,
   category,
   "date": publishedAt,
@@ -317,6 +323,8 @@ export async function getJournalPost(
 // ============ Home Page ============
 
 const homePageQuery = `*[_type == "homePage"][0] {
+  seoTitle,
+  seoDescription,
   heroHeadline,
   heroSubheadline,
   heroCta,
@@ -347,7 +355,7 @@ export type HomePageResult = {
   fetchError: boolean
 }
 
-export async function getHomePage(): Promise<HomePageResult> {
+export const getHomePage = cache(async function getHomePage(): Promise<HomePageResult> {
   const client = getSanityClient()
   if (!client) {
     return { page: null, sanityConfigured: false, fetchError: false }
@@ -364,7 +372,7 @@ export async function getHomePage(): Promise<HomePageResult> {
     console.error("Sanity home page fetch error:", e)
     return { page: null, sanityConfigured: true, fetchError: true }
   }
-}
+})
 
 // ============ About Page ============
 
@@ -532,3 +540,91 @@ export async function getSiteFooter(): Promise<SiteFooterResult> {
     return { footer: null, sanityConfigured: true, fetchError: true }
   }
 }
+
+// ============ Site settings (global SEO) ============
+
+const siteSettingsQuery = `*[_type == "siteSettings"][0] {
+  title,
+  description,
+  seoTitle,
+  seoDescription,
+  organizationDescription,
+  "logoUrl": logo.asset->url,
+  "ogImage": ogImage.asset->url,
+  "twitterImage": twitterImage.asset->url,
+  socialLinks {
+    instagram,
+    twitter,
+    pinterest,
+    email
+  }
+}`
+
+export type SiteSettingsResult = {
+  settings: SiteSettingsSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export const getSiteSettings = cache(async function getSiteSettings(): Promise<SiteSettingsResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { settings: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const settings = await client.fetch<SiteSettingsSanity | null>(
+      siteSettingsQuery
+    )
+    return {
+      settings: settings ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity site settings fetch error:", e)
+    return { settings: null, sanityConfigured: true, fetchError: true }
+  }
+})
+
+// ============ Static page SEO ============
+
+const staticPageSeoQuery = `*[_type == "staticPageSeo"][0] {
+  store { seoTitle, seoDescription },
+  journal { seoTitle, seoDescription },
+  contact { seoTitle, seoDescription },
+  termsOfUse { seoTitle, seoDescription },
+  privacyPolicy { seoTitle, seoDescription },
+  shippingPolicy { seoTitle, seoDescription },
+  cart { seoTitle, seoDescription },
+  checkout { seoTitle, seoDescription },
+  search { seoTitle, seoDescription },
+  notFound { seoTitle, seoDescription }
+}`
+
+export type StaticPageSeoResult = {
+  pages: StaticPageSeoSanity | null
+  sanityConfigured: boolean
+  fetchError: boolean
+}
+
+export const getStaticPageSeo = cache(async function getStaticPageSeo(): Promise<StaticPageSeoResult> {
+  const client = getSanityClient()
+  if (!client) {
+    return { pages: null, sanityConfigured: false, fetchError: false }
+  }
+
+  try {
+    const pages = await client.fetch<StaticPageSeoSanity | null>(
+      staticPageSeoQuery
+    )
+    return {
+      pages: pages ?? null,
+      sanityConfigured: true,
+      fetchError: false,
+    }
+  } catch (e) {
+    console.error("Sanity static page SEO fetch error:", e)
+    return { pages: null, sanityConfigured: true, fetchError: true }
+  }
+})
