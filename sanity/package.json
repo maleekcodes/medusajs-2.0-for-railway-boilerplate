@@ -8,7 +8,8 @@
     "build": "sanity build",
     "deploy": "sanity deploy",
     "start": "sanity start",
-    "seed": "tsx seed.ts"
+    "seed": "tsx seed.ts",
+    "migrate:intro-text": "tsx migrate-intro-text.ts"
   },
   "dependencies": {
     "@sanity/client": "^6.15.0",
