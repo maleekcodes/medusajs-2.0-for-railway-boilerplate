@@ -10,12 +10,17 @@ import { Collection } from "@modules/home/components/xyz/Collection"
 import { Philosophy } from "@modules/home/components/xyz/Philosophy"
 import { VirtualTryOnSection } from "@modules/home/components/xyz/VirtualTryOnSection"
 import { PrivateGate } from "@modules/home/components/xyz/PrivateGate"
+import { listCategories } from "@lib/data/categories"
 import { getCollectionsWithProducts } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import {
   getHomePage,
   getPrivateExpressionsPage,
 } from "@lib/sanity/queries"
+import {
+  FALLBACK_COLLECTION_ITEMS,
+  mapCategoriesToCollectionItems,
+} from "@modules/home/lib/map-categories-to-collection"
 
 export async function generateMetadata(): Promise<Metadata> {
   const [global, homePageResult] = await Promise.all([
@@ -41,12 +46,14 @@ export default async function Home({
 }) {
   const { countryCode } = await params
 
-  const [collections, region, homePageResult, peeResult] = await Promise.all([
-    getCollectionsWithProducts(countryCode),
-    getRegion(countryCode),
-    getHomePage(),
-    getPrivateExpressionsPage(),
-  ])
+  const [collections, region, homePageResult, peeResult, categories] =
+    await Promise.all([
+      getCollectionsWithProducts(countryCode),
+      getRegion(countryCode),
+      getHomePage(),
+      getPrivateExpressionsPage(),
+      listCategories(),
+    ])
 
   if (!collections || !region) {
     return null
@@ -54,6 +61,9 @@ export default async function Home({
 
   const page = homePageResult.page
   const pee = peeResult.page
+  const collectionItems = mapCategoriesToCollectionItems(categories)
+  const homeCollectionItems =
+    collectionItems.length > 0 ? collectionItems : FALLBACK_COLLECTION_ITEMS
 
   const collectionsWithProducts = collections
     .filter((c) => Array.isArray(c.products) && c.products.length > 0)
@@ -87,7 +97,7 @@ export default async function Home({
         <Introduction text={page?.introText ?? undefined} />
       </div>
       <div id="physical">
-        <Collection />
+        <Collection items={homeCollectionItems} />
       </div>
 
       {hasFeaturedProducts && (
