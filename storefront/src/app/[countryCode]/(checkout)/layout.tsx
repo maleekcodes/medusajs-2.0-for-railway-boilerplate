@@ -13,7 +13,7 @@ export default function CheckoutLayout({
       <header className="border-b border-neutral-200 bg-white">
         <Container>
           <nav
-            className="flex h-16 items-center justify-between gap-4 md:h-[4.5rem]"
+            className="flex h-24 items-center justify-between gap-4"
             aria-label="Checkout"
           >
             <LocalizedClientLink
@@ -30,7 +30,7 @@ export default function CheckoutLayout({
               className="flex items-center justify-center text-deepBlack"
               data-testid="store-link"
             >
-              <Logo className="h-8 aspect-[187/150]" />
+              <Logo className="h-20 aspect-[187/150]" />
             </LocalizedClientLink>
             <div className="flex-1 basis-0" />
           </nav>

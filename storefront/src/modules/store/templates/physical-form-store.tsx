@@ -27,7 +27,7 @@ const PhysicalFormStoreTemplate = ({
       <Container>
         <PhysicalFormStoreHero />
 
-        <div className="sticky top-16 z-40 -mx-6 mb-12 bg-white px-6 py-4 md:-mx-12 md:px-12">
+        <div className="sticky top-24 z-40 -mx-6 mb-12 bg-white px-6 py-4 md:-mx-12 md:px-12">
           <PhysicalStoreSortBar sortBy={sort} data-testid="sort-by-container" />
         </div>
 

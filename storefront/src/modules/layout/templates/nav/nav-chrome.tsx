@@ -45,7 +45,7 @@ export default function NavChrome({
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${header}`}
     >
-      <div className="grid w-full grid-cols-3 items-center h-16 px-6 md:px-12 max-w-[90rem] mx-auto">
+      <div className="grid w-full grid-cols-3 items-center h-24 px-6 md:px-12 max-w-[90rem] mx-auto">
         <div className="flex min-w-0 items-center justify-start">
           <nav className="hidden md:flex gap-8 text-sm font-medium tracking-wide">
             <LocalizedClientLink href="/store" className={link}>
@@ -74,7 +74,7 @@ export default function NavChrome({
             className={logoClass}
             data-testid="nav-store-link"
           >
-            <Logo className="h-8 aspect-[187/150]" />
+            <Logo className="h-20 aspect-[187/150]" />
           </LocalizedClientLink>
         </div>
 
