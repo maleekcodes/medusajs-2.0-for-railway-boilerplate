@@ -54,6 +54,13 @@ export default function NavChrome({
             <LocalizedClientLink href="/digital" className={link}>
               Digital Form
             </LocalizedClientLink>
+            <LocalizedClientLink
+              href="/private-expressions"
+              className={link}
+              data-testid="nav-ooo-link"
+            >
+              OOO
+            </LocalizedClientLink>
           </nav>
 
           <div className="md:hidden flex h-full items-center">
@@ -67,7 +74,7 @@ export default function NavChrome({
             className={logoClass}
             data-testid="nav-store-link"
           >
-            <Logo className="h-6 w-auto fill-current" />
+            <Logo className="h-8 aspect-[187/150]" />
           </LocalizedClientLink>
         </div>
 
@@ -81,13 +88,6 @@ export default function NavChrome({
             </LocalizedClientLink>
             <LocalizedClientLink href="/virtual-try-on" className={link}>
               Try-on
-            </LocalizedClientLink>
-            <LocalizedClientLink
-              href="/private-expressions"
-              className={link}
-              data-testid="nav-ooo-link"
-            >
-              OOO
             </LocalizedClientLink>
             {process.env.NEXT_PUBLIC_FEATURE_SEARCH_ENABLED && (
               <LocalizedClientLink

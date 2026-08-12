@@ -30,8 +30,7 @@ export default function CheckoutLayout({
               className="flex items-center justify-center text-deepBlack"
               data-testid="store-link"
             >
-              <Logo className="h-6 w-auto" aria-hidden />
-              <span className="sr-only">Home</span>
+              <Logo className="h-8 aspect-[187/150]" />
             </LocalizedClientLink>
             <div className="flex-1 basis-0" />
           </nav>
