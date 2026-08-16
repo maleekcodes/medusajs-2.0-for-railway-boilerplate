@@ -155,7 +155,8 @@ export const getPhysicalStoreCatalogProducts = cache(async function ({
     pageParam: 1,
     queryParams: {
       limit: 100,
-      fields: "*variants.calculated_price,*categories,*collection",
+      fields:
+        "*variants.calculated_price,*categories,*collection,*images,+thumbnail",
     },
     countryCode,
   })

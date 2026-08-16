@@ -2,13 +2,14 @@
 
 import { motion, type Variants } from "framer-motion"
 import { ArrowRight } from "lucide-react"
+import Image from "next/image"
+
 import { Container } from "@modules/common/components/xyz/Container"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import type {
   CollectionShape,
   HomeCollectionItem,
 } from "@modules/home/lib/map-categories-to-collection"
-import { FALLBACK_COLLECTION_ITEMS } from "@modules/home/lib/map-categories-to-collection"
 
 function CollectionShapeGraphic({ shape }: { shape: CollectionShape }) {
   if (shape === "x") {
@@ -34,11 +35,15 @@ function CollectionShapeGraphic({ shape }: { shape: CollectionShape }) {
 }
 
 export function Collection({
-  items = FALLBACK_COLLECTION_ITEMS,
+  items = [],
 }: {
   items?: HomeCollectionItem[]
 }) {
-  const cards = items.length > 0 ? items : FALLBACK_COLLECTION_ITEMS
+  if (!items.length) {
+    return null
+  }
+
+  const cards = items
 
   const cardVariants: Variants = {
     hover: {
@@ -56,11 +61,11 @@ export function Collection({
     <section className="py-32 bg-white" id="collection">
       <Container>
         <div className="flex justify-between items-end mb-20 border-b border-neutral-100 pb-6">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tighter">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tighter text-balance">
             The Collection
           </h2>
           <span className="font-mono text-xs text-neutral-400">
-            FW 2026 PREVIEW
+            Latest releases
           </span>
         </div>
 
@@ -79,7 +84,13 @@ export function Collection({
               />
 
               <div className="flex justify-between items-start w-full relative z-10">
-                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full border border-deepBlack bg-transparent text-xs font-mono tracking-wide">
+                <span
+                  className={`inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-mono tracking-wide ${
+                    item.isLatest
+                      ? "border border-deepBlack bg-deepBlack text-white"
+                      : "border border-deepBlack bg-transparent"
+                  }`}
+                >
                   {item.line}
                 </span>
 
@@ -95,14 +106,27 @@ export function Collection({
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <CollectionShapeGraphic shape={item.shape} />
+                {item.imageUrl ? (
+                  <div className="relative h-[58%] w-[70%] overflow-hidden bg-white shadow-sm outline outline-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-[1.03]">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.description || item.title}
+                      fill
+                      className="object-cover object-center"
+                      sizes="(min-width: 768px) 28vw, 90vw"
+                      quality={75}
+                    />
+                  </div>
+                ) : (
+                  <CollectionShapeGraphic shape={item.shape} />
+                )}
               </div>
 
               <div className="relative z-10">
-                <h3 className="text-2xl font-bold tracking-tight mb-2">
+                <h3 className="text-2xl font-bold tracking-tight mb-2 text-balance">
                   {item.title}
                 </h3>
-                <p className="text-sm text-neutral-500 font-medium">
+                <p className="text-sm text-neutral-500 font-medium text-pretty">
                   {item.description}
                 </p>
               </div>

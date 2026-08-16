@@ -21,6 +21,7 @@ export type PhysicalProductCardProps = {
     label: string
     imageUrl?: string | null
   }[]
+  isLatest?: boolean
 }
 
 export function PhysicalProductCard({
@@ -33,6 +34,7 @@ export function PhysicalProductCard({
   originalPriceFormatted,
   priceIsSale,
   swatches,
+  isLatest,
 }: PhysicalProductCardProps) {
   const swatchItems = swatches?.slice(0, 5) ?? []
   const [activeSwatch, setActiveSwatch] = useState(0)
@@ -73,9 +75,16 @@ export function PhysicalProductCard({
         className="group bg-concrete p-4 md:p-5 flex flex-col justify-between min-h-[520px] h-full border border-transparent hover:border-neutral-200 transition-colors"
       >
         <div className="flex justify-between items-start">
-          <span className="text-[10px] uppercase tracking-widest font-mono border border-neutral-300 rounded-full px-2 py-0.5 bg-white/50">
-            {lineLabel}
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {isLatest && (
+              <span className="text-[10px] uppercase tracking-widest font-mono rounded-full px-2 py-0.5 bg-deepBlack text-white">
+                Latest
+              </span>
+            )}
+            <span className="text-[10px] uppercase tracking-widest font-mono border border-neutral-300 rounded-full px-2 py-0.5 bg-white/50">
+              {lineLabel}
+            </span>
+          </div>
           <span
             className="text-neutral-400 group-hover:text-deepBlack transition-colors pointer-events-none"
             aria-hidden

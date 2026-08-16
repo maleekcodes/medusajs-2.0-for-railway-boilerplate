@@ -12,14 +12,15 @@ import { VirtualTryOnSection } from "@modules/home/components/xyz/VirtualTryOnSe
 import { PrivateGate } from "@modules/home/components/xyz/PrivateGate"
 import { listCategories } from "@lib/data/categories"
 import { getCollectionsWithProducts } from "@lib/data/collections"
+import { getPhysicalStoreCatalogProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import {
   getHomePage,
   getPrivateExpressionsPage,
 } from "@lib/sanity/queries"
 import {
-  FALLBACK_COLLECTION_ITEMS,
   mapCategoriesToCollectionItems,
+  mapLatestProductsToCollectionItems,
 } from "@modules/home/lib/map-categories-to-collection"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -46,13 +47,17 @@ export default async function Home({
 }) {
   const { countryCode } = await params
 
-  const [collections, region, homePageResult, peeResult, categories] =
+  const [collections, region, homePageResult, peeResult, categories, products] =
     await Promise.all([
       getCollectionsWithProducts(countryCode),
       getRegion(countryCode),
       getHomePage(),
       getPrivateExpressionsPage(),
       listCategories(),
+      getPhysicalStoreCatalogProducts({
+        sortBy: "created_at",
+        countryCode,
+      }),
     ])
 
   if (!collections || !region) {
@@ -61,9 +66,11 @@ export default async function Home({
 
   const page = homePageResult.page
   const pee = peeResult.page
-  const collectionItems = mapCategoriesToCollectionItems(categories)
+  const latestItems = mapLatestProductsToCollectionItems(products, categories)
   const homeCollectionItems =
-    collectionItems.length > 0 ? collectionItems : FALLBACK_COLLECTION_ITEMS
+    latestItems.length > 0
+      ? latestItems
+      : mapCategoriesToCollectionItems(categories)
 
   const collectionsWithProducts = collections
     .filter((c) => Array.isArray(c.products) && c.products.length > 0)

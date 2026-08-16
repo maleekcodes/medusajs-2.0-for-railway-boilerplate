@@ -1,15 +1,21 @@
 import { Suspense } from "react"
 
+import { listCategories } from "@lib/data/categories"
+import { getPhysicalStoreCatalogProducts } from "@lib/data/products"
 import { Container } from "@modules/common/components/xyz/Container"
 import { PhysicalFutureForms } from "@modules/store/components/physical-future-forms"
 import { PhysicalFormStoreHero } from "@modules/store/components/physical-form-store-hero"
 import { PhysicalStoreSortBar } from "@modules/store/components/physical-store-sort-bar"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import {
+  groupProductsByAssignedCategory,
+  listComingSoonCategories,
+} from "@modules/store/lib/group-products-by-category"
 
 import PhysicalFormPaginatedProducts from "./physical-form-paginated-products"
 
-const PhysicalFormStoreTemplate = ({
+const PhysicalFormStoreTemplate = async ({
   sortBy,
   countryCode,
 }: {
@@ -18,6 +24,17 @@ const PhysicalFormStoreTemplate = ({
   countryCode: string
 }) => {
   const sort = sortBy || "created_at"
+
+  const [sorted, allCategories] = await Promise.all([
+    getPhysicalStoreCatalogProducts({
+      sortBy: sort,
+      countryCode,
+    }),
+    listCategories(),
+  ])
+
+  const sections = groupProductsByAssignedCategory(sorted, allCategories)
+  const comingSoon = listComingSoonCategories(allCategories, sections)
 
   return (
     <div
@@ -40,7 +57,7 @@ const PhysicalFormStoreTemplate = ({
           </Suspense>
         </section>
 
-        <PhysicalFutureForms />
+        <PhysicalFutureForms items={comingSoon} />
       </Container>
     </div>
   )

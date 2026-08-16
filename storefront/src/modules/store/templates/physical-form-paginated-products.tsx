@@ -4,10 +4,15 @@ import {
   getProductsById,
 } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { PhysicalProductCard } from "@modules/store/components/physical-product-card"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { buildPhysicalProductCardProps } from "@modules/store/lib/build-physical-product-card-props"
-import { groupProductsByTopLevelCategory } from "@modules/store/lib/group-products-by-category"
+import {
+  groupProductsByAssignedCategory,
+  isLatestInGroup,
+  pinLatestProducts,
+} from "@modules/store/lib/group-products-by-category"
 
 export default async function PhysicalFormPaginatedProducts({
   sortBy,
@@ -41,7 +46,12 @@ export default async function PhysicalFormPaginatedProducts({
     .map((p) => (p.id ? pricedById.get(p.id) : null) ?? p)
     .filter(Boolean) as typeof pricedProducts
 
-  const sections = groupProductsByTopLevelCategory(enriched, allCategories)
+  const sections = groupProductsByAssignedCategory(enriched, allCategories).map(
+    (section) => ({
+      ...section,
+      products: pinLatestProducts(section.products),
+    })
+  )
 
   if (sections.length === 0) {
     return (
@@ -60,7 +70,16 @@ export default async function PhysicalFormPaginatedProducts({
               id={`cat-${section.id}`}
               className="text-xl font-bold tracking-tight text-deepBlack md:text-2xl"
             >
-              {section.name}
+              {section.handle ? (
+                <LocalizedClientLink
+                  href={`/categories/${section.handle}`}
+                  className="hover:opacity-70 transition-opacity"
+                >
+                  {section.name}
+                </LocalizedClientLink>
+              ) : (
+                section.name
+              )}
             </h3>
             <span className="font-mono text-xs text-neutral-400">
               {section.products.length}
@@ -74,7 +93,10 @@ export default async function PhysicalFormPaginatedProducts({
               }
               return (
                 <li key={p.id}>
-                  <PhysicalProductCard {...cardProps} />
+                  <PhysicalProductCard
+                    {...cardProps}
+                    isLatest={isLatestInGroup(p, section.products)}
+                  />
                 </li>
               )
             })}

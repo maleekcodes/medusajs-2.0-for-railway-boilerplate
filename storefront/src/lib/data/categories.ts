@@ -5,8 +5,9 @@ export const listCategories = cache(async function () {
   return sdk.store.category
     .list(
       {
-        fields: "+category_children,+metadata,+parent_category_id",
-        limit: 100,
+        fields:
+          "+category_children,+metadata,+parent_category_id,+is_active,+is_internal,+rank",
+        limit: 200,
       },
       { next: { tags: ["categories"] } }
     )

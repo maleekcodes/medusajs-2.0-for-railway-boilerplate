@@ -1,5 +1,10 @@
 import { HttpTypes } from "@medusajs/types"
 
+import {
+  groupProductsByAssignedCategory,
+  productCreatedAtMs,
+} from "@modules/store/lib/group-products-by-category"
+
 export type CollectionShape = "x" | "y" | "z"
 
 export type HomeCollectionItem = {
@@ -9,45 +14,20 @@ export type HomeCollectionItem = {
   line: string
   href: string
   shape: CollectionShape
+  imageUrl?: string | null
+  isLatest?: boolean
 }
 
 const SHAPES: CollectionShape[] = ["x", "y", "z"]
 
-/** Static fallback when Medusa has no top-level categories yet. */
-export const FALLBACK_COLLECTION_ITEMS: HomeCollectionItem[] = [
-  {
-    id: "01",
-    title: "Structure I",
-    description: "Truckers, Snapbacks, Beanies",
-    line: "X Line",
-    href: "/store",
-    shape: "x",
-  },
-  {
-    id: "02",
-    title: "The Torso",
-    description: "Tees, Sweat Wears, Jackets",
-    line: "Y Line",
-    href: "/store",
-    shape: "y",
-  },
-  {
-    id: "03",
-    title: "Kinetic",
-    description: "Activewear, Sneakers",
-    line: "Z Line",
-    href: "/store",
-    shape: "z",
-  },
-]
+type StoreCategory = HttpTypes.StoreProductCategory & {
+  parent_category_id?: string | null
+  rank?: number
+  is_active?: boolean
+}
 
-function parentCategoryId(
-  c: HttpTypes.StoreProductCategory
-): string | null | undefined {
-  const ext = c as HttpTypes.StoreProductCategory & {
-    parent_category_id?: string | null
-  }
-  return ext.parent_category_id ?? c.parent_category?.id ?? null
+function parentCategoryId(c: StoreCategory): string | null | undefined {
+  return c.parent_category_id ?? c.parent_category?.id ?? null
 }
 
 function metadataString(
@@ -114,12 +94,12 @@ export function mapCategoriesToCollectionItems(
 ): HomeCollectionItem[] {
   if (!categories?.length) return []
 
-  const topLevel = categories
+  const topLevel = (categories as StoreCategory[])
     .filter((c) => !parentCategoryId(c))
     .filter((c) => c.is_active !== false)
     .sort((a, b) => {
-      const ra = (a as { rank?: number }).rank ?? 0
-      const rb = (b as { rank?: number }).rank ?? 0
+      const ra = a.rank ?? 0
+      const rb = b.rank ?? 0
       if (ra !== rb) return ra - rb
       return (a.name ?? "").localeCompare(b.name ?? "")
     })
@@ -143,6 +123,56 @@ export function mapCategoriesToCollectionItems(
         line: resolveLine(c, index),
         href: `/categories/${c.handle}`,
         shape: resolveShape(c.metadata, index),
+      }
+    })
+}
+
+function productImageUrl(product: HttpTypes.StoreProduct): string | null {
+  const thumbnail = product.thumbnail?.trim()
+  if (thumbnail) return thumbnail
+  const first = product.images?.[0] as { url?: string } | undefined
+  const url = first?.url?.trim()
+  return url || null
+}
+
+/**
+ * One homepage card per Medusa category that has products, featuring
+ * that category's newest release. Category names stay dynamic.
+ */
+export function mapLatestProductsToCollectionItems(
+  products: HttpTypes.StoreProduct[] | null | undefined,
+  categories: HttpTypes.StoreProductCategory[] | null | undefined
+): HomeCollectionItem[] {
+  if (!products?.length || !categories?.length) return []
+
+  const byId = new Map(
+    (categories as StoreCategory[]).map((c) => [c.id as string, c])
+  )
+  const sections = groupProductsByAssignedCategory(products, categories)
+
+  return sections
+    .filter((section) => section.id !== "__other__" && section.products.length > 0)
+    .map((section, index) => {
+      const newest = [...section.products].sort(
+        (a, b) => productCreatedAtMs(b) - productCreatedAtMs(a)
+      )[0]
+      const category = byId.get(section.id)
+      const productHandle = newest?.handle
+      const href = section.handle
+        ? `/categories/${section.handle}${
+            productHandle ? `?featured=${encodeURIComponent(productHandle)}` : ""
+          }`
+        : "/store"
+
+      return {
+        id: section.id,
+        title: section.name,
+        description: newest?.title?.trim() || "New release",
+        line: "Latest",
+        href,
+        shape: resolveShape(category?.metadata, index),
+        imageUrl: newest ? productImageUrl(newest) : null,
+        isLatest: true,
       }
     })
 }
